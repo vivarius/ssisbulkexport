@@ -36,13 +36,13 @@
             this.cmbSQLServer = new System.Windows.Forms.ComboBox();
             this.btGO = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabControl = new System.Windows.Forms.TabControl();
+            this.tabSQL = new System.Windows.Forms.TabPage();
             this.txSQL = new System.Windows.Forms.TextBox();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tabView = new System.Windows.Forms.TabPage();
             this.cmbViews = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.tabStoredProcedure = new System.Windows.Forms.TabPage();
             this.cmbStoredProcedures = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.grdParameters = new System.Windows.Forms.DataGridView();
@@ -50,7 +50,7 @@
             this.grdColDirection = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.grdColVars = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.grdColExpression = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.tabTables = new System.Windows.Forms.TabPage();
             this.cmbTables = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
@@ -76,12 +76,13 @@
             this.label2 = new System.Windows.Forms.Label();
             this.txFirstRow = new System.Windows.Forms.TextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
-            this.tabPage3.SuspendLayout();
+            this.chkRightsCMDSHELL = new System.Windows.Forms.CheckBox();
+            this.tabControl.SuspendLayout();
+            this.tabSQL.SuspendLayout();
+            this.tabView.SuspendLayout();
+            this.tabStoredProcedure.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grdParameters)).BeginInit();
-            this.tabPage4.SuspendLayout();
+            this.tabTables.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -114,7 +115,7 @@
             this.cmbSQLServer.Name = "cmbSQLServer";
             this.cmbSQLServer.Size = new System.Drawing.Size(420, 21);
             this.cmbSQLServer.TabIndex = 0;
-            
+            // 
             // btGO
             // 
             this.btGO.Location = new System.Drawing.Point(519, 23);
@@ -134,28 +135,28 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "SQL Server";
             // 
-            // tabControl1
+            // tabControl
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Controls.Add(this.tabPage4);
-            this.tabControl1.Location = new System.Drawing.Point(16, 53);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(545, 171);
-            this.tabControl1.TabIndex = 33;
+            this.tabControl.Controls.Add(this.tabSQL);
+            this.tabControl.Controls.Add(this.tabView);
+            this.tabControl.Controls.Add(this.tabStoredProcedure);
+            this.tabControl.Controls.Add(this.tabTables);
+            this.tabControl.Location = new System.Drawing.Point(16, 53);
+            this.tabControl.Name = "tabControl";
+            this.tabControl.SelectedIndex = 0;
+            this.tabControl.Size = new System.Drawing.Size(545, 171);
+            this.tabControl.TabIndex = 33;
             // 
-            // tabPage1
+            // tabSQL
             // 
-            this.tabPage1.Controls.Add(this.txSQL);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(537, 145);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "SQL Statement";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.tabSQL.Controls.Add(this.txSQL);
+            this.tabSQL.Location = new System.Drawing.Point(4, 22);
+            this.tabSQL.Name = "tabSQL";
+            this.tabSQL.Padding = new System.Windows.Forms.Padding(3);
+            this.tabSQL.Size = new System.Drawing.Size(537, 145);
+            this.tabSQL.TabIndex = 0;
+            this.tabSQL.Text = "SQL Statement";
+            this.tabSQL.UseVisualStyleBackColor = true;
             // 
             // txSQL
             // 
@@ -166,17 +167,17 @@
             this.txSQL.Size = new System.Drawing.Size(531, 139);
             this.txSQL.TabIndex = 0;
             // 
-            // tabPage2
+            // tabView
             // 
-            this.tabPage2.Controls.Add(this.cmbViews);
-            this.tabPage2.Controls.Add(this.label6);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(537, 145);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "View";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.tabView.Controls.Add(this.cmbViews);
+            this.tabView.Controls.Add(this.label6);
+            this.tabView.Location = new System.Drawing.Point(4, 22);
+            this.tabView.Name = "tabView";
+            this.tabView.Padding = new System.Windows.Forms.Padding(3);
+            this.tabView.Size = new System.Drawing.Size(537, 145);
+            this.tabView.TabIndex = 1;
+            this.tabView.Text = "View";
+            this.tabView.UseVisualStyleBackColor = true;
             // 
             // cmbViews
             // 
@@ -195,18 +196,18 @@
             this.label6.TabIndex = 29;
             this.label6.Text = "Views:";
             // 
-            // tabPage3
+            // tabStoredProcedure
             // 
-            this.tabPage3.Controls.Add(this.cmbStoredProcedures);
-            this.tabPage3.Controls.Add(this.label5);
-            this.tabPage3.Controls.Add(this.grdParameters);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(537, 145);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Stored Procedure";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            this.tabStoredProcedure.Controls.Add(this.cmbStoredProcedures);
+            this.tabStoredProcedure.Controls.Add(this.label5);
+            this.tabStoredProcedure.Controls.Add(this.grdParameters);
+            this.tabStoredProcedure.Location = new System.Drawing.Point(4, 22);
+            this.tabStoredProcedure.Name = "tabStoredProcedure";
+            this.tabStoredProcedure.Padding = new System.Windows.Forms.Padding(3);
+            this.tabStoredProcedure.Size = new System.Drawing.Size(537, 145);
+            this.tabStoredProcedure.TabIndex = 2;
+            this.tabStoredProcedure.Text = "Stored Procedure";
+            this.tabStoredProcedure.UseVisualStyleBackColor = true;
             // 
             // cmbStoredProcedures
             // 
@@ -242,6 +243,7 @@
             this.grdParameters.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.grdParameters.Size = new System.Drawing.Size(531, 105);
             this.grdParameters.TabIndex = 26;
+            this.grdParameters.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.grdParameters_CellContentClick);
             // 
             // grdColParams
             // 
@@ -284,17 +286,17 @@
             this.grdColExpression.ToolTipText = "Expressions...";
             this.grdColExpression.Width = 30;
             // 
-            // tabPage4
+            // tabTables
             // 
-            this.tabPage4.Controls.Add(this.cmbTables);
-            this.tabPage4.Controls.Add(this.label7);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(537, 145);
-            this.tabPage4.TabIndex = 3;
-            this.tabPage4.Text = "Tables";
-            this.tabPage4.UseVisualStyleBackColor = true;
+            this.tabTables.Controls.Add(this.cmbTables);
+            this.tabTables.Controls.Add(this.label7);
+            this.tabTables.Location = new System.Drawing.Point(4, 22);
+            this.tabTables.Name = "tabTables";
+            this.tabTables.Padding = new System.Windows.Forms.Padding(3);
+            this.tabTables.Size = new System.Drawing.Size(537, 145);
+            this.tabTables.TabIndex = 3;
+            this.tabTables.Text = "Tables";
+            this.tabTables.UseVisualStyleBackColor = true;
             // 
             // cmbTables
             // 
@@ -351,6 +353,7 @@
             this.optFileConnection.TabStop = true;
             this.optFileConnection.Text = "File Connection";
             this.optFileConnection.UseVisualStyleBackColor = true;
+            this.optFileConnection.CheckedChanged += new System.EventHandler(this.optFileConnection_CheckedChanged);
             this.optFileConnection.Click += new System.EventHandler(this.optFileConnection_Click);
             // 
             // optFileVariable
@@ -362,6 +365,7 @@
             this.optFileVariable.TabIndex = 40;
             this.optFileVariable.Text = "Variable / Expression ";
             this.optFileVariable.UseVisualStyleBackColor = true;
+            this.optFileVariable.CheckedChanged += new System.EventHandler(this.optFileVariable_CheckedChanged);
             this.optFileVariable.Click += new System.EventHandler(this.optFileVariable_Click);
             // 
             // btPreview
@@ -375,6 +379,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.chkRightsCMDSHELL);
             this.groupBox1.Controls.Add(this.groupBox2);
             this.groupBox1.Controls.Add(this.txRowTerminator);
             this.groupBox1.Controls.Add(this.label9);
@@ -455,8 +460,8 @@
             this.chkTrustedConnection.TabIndex = 0;
             this.chkTrustedConnection.Text = "Use a trusted connection using integrated security";
             this.toolTip1.SetToolTip(this.chkTrustedConnection, "Connects to SQL Server with a trusted connection using integrated security. The s" +
-        "ecurity credentials of the network user, login_id, and password are not required" +
-        ". \r\n");
+                    "ecurity credentials of the network user, login_id, and password are not required" +
+                    ". \r\n");
             this.chkTrustedConnection.UseVisualStyleBackColor = true;
             this.chkTrustedConnection.Click += new System.EventHandler(this.chkTrustedConnection_Click);
             // 
@@ -476,7 +481,7 @@
             this.label9.TabIndex = 7;
             this.label9.Text = "Row terminator:";
             this.toolTip1.SetToolTip(this.label9, "Specifies the row terminator. The default is \\n (newline character). Use this par" +
-        "ameter to override the default row terminator.\r\n");
+                    "ameter to override the default row terminator.\r\n");
             // 
             // txFieldTerminator
             // 
@@ -498,7 +503,7 @@
             this.label4.TabIndex = 5;
             this.label4.Text = "Field terminator";
             this.toolTip1.SetToolTip(this.label4, "Specifies the field terminator. The default is \\t (tab character). Use this param" +
-        "eter to override the default field terminator. \r\n");
+                    "eter to override the default field terminator. \r\n");
             // 
             // chkNativeDatabase
             // 
@@ -511,7 +516,7 @@
             this.chkNativeDatabase.TabIndex = 4;
             this.chkNativeDatabase.Text = "Use the native (database) data types of the data";
             this.toolTip1.SetToolTip(this.chkNativeDatabase, "Performs the bulk-copy operation using the native (database) data types of the da" +
-        "ta. This option does not prompt for each field; it uses the native values.\r\n");
+                    "ta. This option does not prompt for each field; it uses the native values.\r\n");
             this.chkNativeDatabase.UseVisualStyleBackColor = true;
             // 
             // txLastRow
@@ -548,6 +553,16 @@
             this.txFirstRow.Size = new System.Drawing.Size(76, 20);
             this.txFirstRow.TabIndex = 0;
             // 
+            // chkRightsCMDSHELL
+            // 
+            this.chkRightsCMDSHELL.AutoSize = true;
+            this.chkRightsCMDSHELL.Location = new System.Drawing.Point(326, 73);
+            this.chkRightsCMDSHELL.Name = "chkRightsCMDSHELL";
+            this.chkRightsCMDSHELL.Size = new System.Drawing.Size(136, 17);
+            this.chkRightsCMDSHELL.TabIndex = 10;
+            this.chkRightsCMDSHELL.Text = "Activate | xp_cmdshell |";
+            this.chkRightsCMDSHELL.UseVisualStyleBackColor = true;
+            // 
             // frmEditProperties
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -560,7 +575,7 @@
             this.Controls.Add(this.cmdFileVariable);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.cmbDestination);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.tabControl);
             this.Controls.Add(this.btSave);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.label1);
@@ -573,16 +588,16 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Edit task properties";
-            this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
-            this.tabPage2.PerformLayout();
-            this.tabPage3.ResumeLayout(false);
-            this.tabPage3.PerformLayout();
+            this.tabControl.ResumeLayout(false);
+            this.tabSQL.ResumeLayout(false);
+            this.tabSQL.PerformLayout();
+            this.tabView.ResumeLayout(false);
+            this.tabView.PerformLayout();
+            this.tabStoredProcedure.ResumeLayout(false);
+            this.tabStoredProcedure.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grdParameters)).EndInit();
-            this.tabPage4.ResumeLayout(false);
-            this.tabPage4.PerformLayout();
+            this.tabTables.ResumeLayout(false);
+            this.tabTables.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -599,12 +614,12 @@
         private System.Windows.Forms.ComboBox cmbSQLServer;
         private System.Windows.Forms.Button btGO;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabControl tabControl;
+        private System.Windows.Forms.TabPage tabSQL;
+        private System.Windows.Forms.TabPage tabView;
         private System.Windows.Forms.ComboBox cmbViews;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.TabPage tabStoredProcedure;
         private System.Windows.Forms.ComboBox cmbStoredProcedures;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.DataGridView grdParameters;
@@ -613,7 +628,7 @@
         private System.Windows.Forms.DataGridViewComboBoxColumn grdColVars;
         private System.Windows.Forms.DataGridViewButtonColumn grdColExpression;
         private System.Windows.Forms.TextBox txSQL;
-        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.TabPage tabTables;
         private System.Windows.Forms.ComboBox cmbTables;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
@@ -639,6 +654,7 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.ComboBox cmbLogin;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.CheckBox chkRightsCMDSHELL;
 
     }
 }

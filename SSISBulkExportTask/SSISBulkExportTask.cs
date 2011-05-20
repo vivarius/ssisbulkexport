@@ -31,18 +31,39 @@ namespace SSISBulkExportTask100.SSIS
         #endregion
 
         #region Public Properties
-        [Category("Component specific"), Description("Webservice URL")]
-        public string ServiceUrl { get; set; }
-        [Category("Component specific"), Description("Service")]
-        public string Service { get; set; }
-        [Category("Component specific"), Description("WebMethod")]
-        public string WebMethod { get; set; }
-        [Category("Component specific"), Description("MappingParams")]
-        public object MappingParams { get; set; }
-        [Category("Component specific"), Description("Output Variable")]
-        public string ReturnedValue { get; set; }
-        [Category("Component specific"), Description("The method returns a value? (O/1)")]
-        public string IsValueReturned { get; set; }
+        [Category("Component specific"), Description("SQL Server Instance")]
+        public string SQLServerInstance { get; set; }
+        [Category("Component specific"), Description("Data Source: SQL Statement / View / Stored Procedure / Direct Table")]
+        public string DataSource { get; set; }
+        [Category("Component specific"), Description("SQL Statment")]
+        public string SQLStatment { get; set; }
+        [Category("Component specific"), Description("Used View")]
+        public string View { get; set; }
+        [Category("Component specific"), Description("Stored Procedure")]
+        public object StoredProcedure { get; set; }
+        [Category("Component specific"), Description("Table")]
+        public string Tables { get; set; }
+        [Category("Component specific"), Description("First row")]
+        public string FirstRow { get; set; }
+        [Category("Component specific"), Description("Last row")]
+        public string LastRow { get; set; }
+        [Category("Component specific"), Description("Field terminator")]
+        public string FieldTermiantor { get; set; }
+        [Category("Component specific"), Description("Row terminator")]
+        public string RowTermiantor { get; set; }
+        [Category("Component specific"), Description("Use native database data type")]
+        public string NativeDatabaseDataType { get; set; }
+        [Category("Component specific"), Description("Trusted connection")]
+        public object TrustedConnection { get; set; }
+        [Category("Component specific"), Description("Login (for untrusted connection)")]
+        public string Login { get; set; }
+        [Category("Component specific"), Description("Password (for untrusted connection)")]
+        public string Password { get; set; }
+        [Category("Component specific"), Description("Destination path")]
+        public string DestinationPath { get; set; }
+        [Category("Component specific"), Description("Destination path is a File connector or a variable/expression? (O/1)")]
+        public string DestinationByFileConnection { get; set; }
+
         #endregion
 
         #region Private Properties
@@ -66,23 +87,11 @@ namespace SSISBulkExportTask100.SSIS
                 isBaseValid = false;
             }
 
-            if (string.IsNullOrEmpty(ServiceUrl))
-            {
-                componentEvents.FireError(0, "SSISBulkExportTask", "An URL is required.", "", 0);
-                isBaseValid = false;
-            }
-
-            if (string.IsNullOrEmpty(Service))
-            {
-                componentEvents.FireError(0, "SSISBulkExportTask", "A service name is required.", "", 0);
-                isBaseValid = false;
-            }
-
-            if (string.IsNullOrEmpty(WebMethod))
-            {
-                componentEvents.FireError(0, "SSISBulkExportTask", "A WebMethod name is required.", "", 0);
-                isBaseValid = false;
-            }
+            //if (string.IsNullOrEmpty(ServiceUrl))
+            //{
+            //    componentEvents.FireError(0, "SSISBulkExportTask", "An URL is required.", "", 0);
+            //    isBaseValid = false;
+            //}
 
             return isBaseValid ? DTSExecResult.Success : DTSExecResult.Failure;
         }
@@ -115,57 +124,57 @@ namespace SSISBulkExportTask100.SSIS
 
             try
             {
-                componentEvents.FireInformation(0,
-                                               "SSISBulkExportTask",
-                                               string.Format("Initialize WebService: {0}", EvaluateExpression(ServiceUrl, variableDispenser)),
-                                               string.Empty,
-                                               0,
-                                               ref refire);
-                object[] result = null;
-                
-                if (result != null)
-                {
-                    if (IsValueReturned == "1")
-                    {
-                        componentEvents.FireInformation(0,
-                                                        "SSISBulkExportTask",
-                                                        string.Format("Get the Returned Value to: {0}", ReturnedValue),
-                                                        string.Empty,
-                                                        0,
-                                                        ref refire);
+                //componentEvents.FireInformation(0,
+                //                               "SSISBulkExportTask",
+                //                               string.Format("Initialize WebService: {0}", EvaluateExpression(ServiceUrl, variableDispenser)),
+                //                               string.Empty,
+                //                               0,
+                //                               ref refire);
+                //object[] result = null;
 
-                        string val = ReturnedValue.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
+                //if (result != null)
+                //{
+                //    if (IsValueReturned == "1")
+                //    {
+                //        componentEvents.FireInformation(0,
+                //                                        "SSISBulkExportTask",
+                //                                        string.Format("Get the Returned Value to: {0}", ReturnedValue),
+                //                                        string.Empty,
+                //                                        0,
+                //                                        ref refire);
 
-                        componentEvents.FireInformation(0,
-                                                        "SSISBulkExportTask",
-                                                        string.Format("Get the Returned Value to {0} and convert to {1}",
-                                                                      val.Substring(0, val.Length - 1),
-                                                                      _vars[val.Substring(0, val.Length - 1)].DataType),
-                                                        string.Empty,
-                                                        0,
-                                                        ref refire);
+                //        string val = ReturnedValue.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
 
-                        _vars[val.Substring(0, val.Length - 1)].Value = Convert.ChangeType(result[0], _vars[val.Substring(0, val.Length - 1)].DataType);
+                //        componentEvents.FireInformation(0,
+                //                                        "SSISBulkExportTask",
+                //                                        string.Format("Get the Returned Value to {0} and convert to {1}",
+                //                                                      val.Substring(0, val.Length - 1),
+                //                                                      _vars[val.Substring(0, val.Length - 1)].DataType),
+                //                                        string.Empty,
+                //                                        0,
+                //                                        ref refire);
 
-                        componentEvents.FireInformation(0,
-                                                        "SSISBulkExportTask",
-                                                        string.Format("The String Result is {0} ",
-                                                                      _vars[val.Substring(0, val.Length - 1)].Value),
-                                                        string.Empty,
-                                                        0,
-                                                        ref refire);
-                    }
-                    else
-                    {
-                        componentEvents.FireInformation(0,
-                                                        "SSISBulkExportTask",
-                                                        "Execution without return or no associated return variable",
-                                                        string.Empty,
-                                                        0,
-                                                        ref refire);
-                    }
+                //        _vars[val.Substring(0, val.Length - 1)].Value = Convert.ChangeType(result[0], _vars[val.Substring(0, val.Length - 1)].DataType);
 
-                }
+                //        componentEvents.FireInformation(0,
+                //                                        "SSISBulkExportTask",
+                //                                        string.Format("The String Result is {0} ",
+                //                                                      _vars[val.Substring(0, val.Length - 1)].Value),
+                //                                        string.Empty,
+                //                                        0,
+                //                                        ref refire);
+                //    }
+                //    else
+                //    {
+                //        componentEvents.FireInformation(0,
+                //                                        "SSISBulkExportTask",
+                //                                        "Execution without return or no associated return variable",
+                //                                        string.Empty,
+                //                                        0,
+                //                                        ref refire);
+                //    }
+
+                //}
 
             }
             catch (Exception ex)
@@ -228,162 +237,160 @@ namespace SSISBulkExportTask100.SSIS
 
             try
             {
-                var param = ServiceUrl;
+                //    var param = ServiceUrl;
 
-                componentEvents.FireInformation(0, "SSISBulkExportTask", "ServiceUrl = " + ServiceUrl, string.Empty, 0, ref refire);
+                //    componentEvents.FireInformation(0, "SSISBulkExportTask", "ServiceUrl = " + ServiceUrl, string.Empty, 0, ref refire);
 
-                if (param.Contains("@"))
-                {
-                    var regexStr = param.Split('@');
+                //    if (param.Contains("@"))
+                //    {
+                //        var regexStr = param.Split('@');
 
-                    foreach (var nexSplitedVal in regexStr.Where(val => val.Trim().Length != 0).Select(strVal => strVal.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries)))
-                    {
-                        try
-                        {
-                            componentEvents.FireInformation(0, "SSISBulkExportTask", nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')), string.Empty, 0, ref refire);
-                            variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
-                        }
-                        catch (Exception exception)
-                        {
-                            throw new Exception(exception.Message);
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                //We will continue...
-            }
+                //        foreach (var nexSplitedVal in regexStr.Where(val => val.Trim().Length != 0).Select(strVal => strVal.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries)))
+                //        {
+                //            try
+                //            {
+                //                componentEvents.FireInformation(0, "SSISBulkExportTask", nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')), string.Empty, 0, ref refire);
+                //                variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
+                //            }
+                //            catch (Exception exception)
+                //            {
+                //                throw new Exception(exception.Message);
+                //            }
+                //        }
+                //    }
+                //}
+                //catch
+                //{
+                //    //We will continue...
+                //}
 
-            try
-            {
-                var param = Service;
+                //try
+                //{
+                //    var param = Service;
 
-                componentEvents.FireInformation(0, "SSISBulkExportTask", "Service = " + Service, string.Empty, 0, ref refire);
+                //    componentEvents.FireInformation(0, "SSISBulkExportTask", "Service = " + Service, string.Empty, 0, ref refire);
 
-                if (param.Contains("@"))
-                {
-                    var regexStr = param.Split('@');
+                //    if (param.Contains("@"))
+                //    {
+                //        var regexStr = param.Split('@');
 
-                    foreach (var nexSplitedVal in regexStr.Where(val => val.Trim().Length != 0).Select(strVal => strVal.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries)))
-                    {
-                        try
-                        {
-                            componentEvents.FireInformation(0, "SSISBulkExportTask", nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')), string.Empty, 0, ref refire);
-                            variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
-                        }
-                        catch (Exception exception)
-                        {
-                            throw new Exception(exception.Message);
-                        }
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                throw new Exception(exception.Message);
-            }
+                //        foreach (var nexSplitedVal in regexStr.Where(val => val.Trim().Length != 0).Select(strVal => strVal.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries)))
+                //        {
+                //            try
+                //            {
+                //                componentEvents.FireInformation(0, "SSISBulkExportTask", nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')), string.Empty, 0, ref refire);
+                //                variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
+                //            }
+                //            catch (Exception exception)
+                //            {
+                //                throw new Exception(exception.Message);
+                //            }
+                //        }
+                //    }
+                //}
+                //catch (Exception exception)
+                //{
+                //    throw new Exception(exception.Message);
+                //}
 
-            try
-            {
-                var param = WebMethod;
+                //try
+                //{
+                //    var param = WebMethod;
 
-                componentEvents.FireInformation(0, "SSISBulkExportTask", "WebMethod = " + WebMethod, string.Empty, 0, ref refire);
+                //    componentEvents.FireInformation(0, "SSISBulkExportTask", "WebMethod = " + WebMethod, string.Empty, 0, ref refire);
 
-                if (param.Contains("@"))
-                {
-                    var regexStr = param.Split('@');
+                //    if (param.Contains("@"))
+                //    {
+                //        var regexStr = param.Split('@');
 
-                    foreach (var nexSplitedVal in regexStr.Where(val => val.Trim().Length != 0).Select(strVal => strVal.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries)))
-                    {
-                        try
-                        {
-                            componentEvents.FireInformation(0, "SSISBulkExportTask", nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')), string.Empty, 0, ref refire);
-                            variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
-                        }
-                        catch (Exception exception)
-                        {
-                            throw new Exception(exception.Message);
-                        }
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                throw new Exception(exception.Message);
-            }
+                //        foreach (var nexSplitedVal in regexStr.Where(val => val.Trim().Length != 0).Select(strVal => strVal.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries)))
+                //        {
+                //            try
+                //            {
+                //                componentEvents.FireInformation(0, "SSISBulkExportTask", nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')), string.Empty, 0, ref refire);
+                //                variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
+                //            }
+                //            catch (Exception exception)
+                //            {
+                //                throw new Exception(exception.Message);
+                //            }
+                //        }
+                //    }
+                //}
+                //catch (Exception exception)
+                //{
+                //    throw new Exception(exception.Message);
+                //}
 
-            try
-            {
+                //try
+                //{
 
-                if (!string.IsNullOrEmpty(ReturnedValue))
-                {
-                    var param = ReturnedValue;
+                //    if (!string.IsNullOrEmpty(ReturnedValue))
+                //    {
+                //        var param = ReturnedValue;
 
-                    componentEvents.FireInformation(0, "SSISBulkExportTask", "ReturnedValue = " + ReturnedValue,
-                                                    string.Empty, 0, ref refire);
+                //        componentEvents.FireInformation(0, "SSISBulkExportTask", "ReturnedValue = " + ReturnedValue,
+                //                                        string.Empty, 0, ref refire);
 
-                    if (param.Contains("@"))
-                    {
-                        var regexStr = param.Split('@');
+                //        if (param.Contains("@"))
+                //        {
+                //            var regexStr = param.Split('@');
 
-                        foreach (var nexSplitedVal in regexStr.Where(val => val.Trim().Length != 0).Select(strVal => strVal.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries)))
-                        {
-                            try
-                            {
-                                componentEvents.FireInformation(0, "SSISBulkExportTask",
-                                                                nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')),
-                                                                string.Empty, 0, ref refire);
-                                variableDispenser.LockForWrite(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
-                            }
-                            catch (Exception exception)
-                            {
-                                throw new Exception(exception.Message);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                throw new Exception(exception.Message);
-            }
+                //            foreach (var nexSplitedVal in regexStr.Where(val => val.Trim().Length != 0).Select(strVal => strVal.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries)))
+                //            {
+                //                try
+                //                {
+                //                    componentEvents.FireInformation(0, "SSISBulkExportTask",
+                //                                                    nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')),
+                //                                                    string.Empty, 0, ref refire);
+                //                    variableDispenser.LockForWrite(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
+                //                }
+                //                catch (Exception exception)
+                //                {
+                //                    throw new Exception(exception.Message);
+                //                }
+                //            }
+                //        }
+                //    }
+                //}
+                //catch (Exception exception)
+                //{
+                //    throw new Exception(exception.Message);
+                //}
 
-            try
-            {
-                componentEvents.FireInformation(0, "SSISBulkExportTask", "MappingParams ", string.Empty, 0, ref refire);
+                //try
+                //{
+                //    componentEvents.FireInformation(0, "SSISBulkExportTask", "MappingParams ", string.Empty, 0, ref refire);
 
-                //Get variables for MappingParams
-                foreach (var mappingParams in (MappingParams)MappingParams)
-                {
+                //    //Get variables for MappingParams
+                //    foreach (var mappingParams in (MappingParams)MappingParams)
+                //    {
 
-                    try
-                    {
-                        if (mappingParams.Value.Contains("@"))
-                        {
-                            var regexStr = mappingParams.Value.Split('@');
+                //        try
+                //        {
+                //            if (mappingParams.Value.Contains("@"))
+                //            {
+                //                var regexStr = mappingParams.Value.Split('@');
 
-                            foreach (var nexSplitedVal in
-                                    regexStr.Where(val => val.Trim().Length != 0).Select(strVal => strVal.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries)))
-                            {
-                                try
-                                {
-                                    componentEvents.FireInformation(0, "SSISBulkExportTask", nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')), string.Empty, 0, ref refire);
-                                    variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
-                                }
-                                catch (Exception exception)
-                                {
-                                    throw new Exception(exception.Message);
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception exception)
-                    {
-                        throw new Exception(exception.Message);
-                    }
-
-                }
+                //                foreach (var nexSplitedVal in
+                //                        regexStr.Where(val => val.Trim().Length != 0).Select(strVal => strVal.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries)))
+                //                {
+                //                    try
+                //                    {
+                //                        componentEvents.FireInformation(0, "SSISBulkExportTask", nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')), string.Empty, 0, ref refire);
+                //                        variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
+                //                    }
+                //                    catch (Exception exception)
+                //                    {
+                //                        throw new Exception(exception.Message);
+                //                    }
+                //                }
+                //            }
+                //        }
+                //        catch (Exception exception)
+                //        {
+                //            throw new Exception(exception.Message);
+                //        }
             }
             catch (Exception ex)
             {
@@ -404,34 +411,75 @@ namespace SSISBulkExportTask100.SSIS
         /// <param name="infoEvents">The info events.</param>
         void IDTSComponentPersist.SaveToXML(XmlDocument doc, IDTSInfoEvents infoEvents)
         {
-            //XmlElement taskElement = doc.CreateElement(string.Empty, "SSISBulkExportTask", string.Empty);
+            XmlElement taskElement = doc.CreateElement(string.Empty, "SSISBulkExportTask", string.Empty);
 
-            //XmlAttribute serviceUrl = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
-            //serviceUrl.Value = ServiceUrl;
+            XmlAttribute sqlServer = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            sqlServer.Value = SQLServerInstance;
 
-            //XmlAttribute service = doc.CreateAttribute(string.Empty, Keys.SQL_STATEMENT, string.Empty);
-            //service.Value = Service;
+            XmlAttribute dataSource = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            dataSource.Value = DataSource;
 
-            //XmlAttribute webMethod = doc.CreateAttribute(string.Empty, Keys.WEBMETHOD, string.Empty);
-            //webMethod.Value = WebMethod;
+            XmlAttribute sqlStatment = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            sqlStatment.Value = SQLStatment;
 
-            //XmlAttribute mappingParams = doc.CreateAttribute(string.Empty, Keys.MAPPING_PARAMS, string.Empty);
-            //mappingParams.Value = Serializer.SerializeToXmlString(MappingParams);
+            XmlAttribute view = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            view.Value = View;
 
-            //XmlAttribute returnedVariable = doc.CreateAttribute(string.Empty, Keys.RETURNED_VALUE, string.Empty);
-            //returnedVariable.Value = ReturnedValue;
+            XmlAttribute storedProcedure = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            storedProcedure.Value = StoredProcedure;
 
-            //XmlAttribute isReturnedVariable = doc.CreateAttribute(string.Empty, Keys.IS_VALUE_RETURNED, string.Empty);
-            //isReturnedVariable.Value = IsValueReturned;
+            XmlAttribute tables = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            tables.Value = Tables;
 
-            //taskElement.Attributes.Append(serviceUrl);
-            //taskElement.Attributes.Append(service);
-            //taskElement.Attributes.Append(webMethod);
-            //taskElement.Attributes.Append(mappingParams);
-            //taskElement.Attributes.Append(returnedVariable);
-            //taskElement.Attributes.Append(isReturnedVariable);
+            XmlAttribute firstRow = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            firstRow.Value = FirstRow;
 
-            //doc.AppendChild(taskElement);
+            XmlAttribute lastRow = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            lastRow.Value = LastRow;
+
+            XmlAttribute fieldTermiantor = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            fieldTermiantor.Value = FieldTermiantor;
+
+            XmlAttribute rowTermiantor = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            rowTermiantor.Value = RowTermiantor;
+
+            XmlAttribute nativeDatabaseDataType = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            nativeDatabaseDataType.Value = NativeDatabaseDataType;
+
+
+            XmlAttribute trustedConnection = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            trustedConnection.Value = TrustedConnection;
+
+            XmlAttribute login = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            login.Value = Login;
+
+            XmlAttribute password = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            password.Value = Password;
+
+            XmlAttribute destinationPath = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            destinationPath.Value = DestinationPath;
+
+            XmlAttribute destinationByFileConnection = doc.CreateAttribute(string.Empty, Keys.SQL_SERVER, string.Empty);
+            destinationByFileConnection.Value = DestinationByFileConnection;
+
+            taskElement.Attributes.Append(sqlServer);
+            taskElement.Attributes.Append(dataSource);
+            taskElement.Attributes.Append(sqlStatment);
+            taskElement.Attributes.Append(view);
+            taskElement.Attributes.Append(storedProcedure);
+            taskElement.Attributes.Append(tables);
+            taskElement.Attributes.Append(firstRow);
+            taskElement.Attributes.Append(lastRow);
+            taskElement.Attributes.Append(fieldTermiantor);
+            taskElement.Attributes.Append(rowTermiantor);
+            taskElement.Attributes.Append(nativeDatabaseDataType);
+            taskElement.Attributes.Append(trustedConnection);
+            taskElement.Attributes.Append(login);
+            taskElement.Attributes.Append(password);
+            taskElement.Attributes.Append(destinationPath);
+            taskElement.Attributes.Append(destinationByFileConnection);
+
+            doc.AppendChild(taskElement);
         }
 
         /// <summary>

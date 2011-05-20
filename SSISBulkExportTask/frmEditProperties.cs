@@ -48,14 +48,52 @@ namespace SSISBulkExportTask100
             InitializeComponent();
 
             _taskHost = taskHost;
+            _isFirstLoad = true;
 
             try
             {
+                Cursor = Cursors.WaitCursor;
 
                 LoadDBConnections();
-                LoadFileConnections();
 
-                Cursor = Cursors.WaitCursor;
+                cmbSQLServer.SelectedIndex = FindStringInComboBox(cmbSQLServer, _taskHost.Properties[Keys.SQL_SERVER].GetValue(_taskHost).ToString(), -1);
+
+                txFirstRow.Text = _taskHost.Properties[Keys.FIRSTROW].GetValue(_taskHost).ToString();
+                txLastRow.Text = _taskHost.Properties[Keys.LASTROW].GetValue(_taskHost).ToString();
+                txFieldTerminator.Text = _taskHost.Properties[Keys.FIELD_TERMINATOR].GetValue(_taskHost).ToString();
+                txRowTerminator.Text = _taskHost.Properties[Keys.ROW_TERMINATOR].GetValue(_taskHost).ToString();
+
+                txSQL.Text = _taskHost.Properties[Keys.SQL_STATEMENT].GetValue(_taskHost).ToString();
+
+                if (_taskHost.Properties[Keys.DESTINATION_FILE_CONNECTION].GetValue(_taskHost).ToString() == Keys.TRUE)
+                    LoadFileConnections();
+                else
+                {
+                    string selItem = string.Empty;
+                    cmbDestination = LoadVariables("System.String", ref selItem);
+                }
+
+                if (_taskHost.Properties[Keys.TRUSTED_CONNECTION].GetValue(_taskHost).ToString() == Keys.TRUE)
+                {
+                    cmbLogin.Items.Clear();
+                    cmbPassword.Items.Clear();
+                }
+                else
+                {
+                    string selItem = string.Empty;
+                    cmbPassword = cmbLogin = LoadVariables("System.String", ref selItem);
+                }
+
+                LoadDataBaseObjects();
+
+                cmbViews.SelectedIndex = FindStringInComboBox(cmbViews, _taskHost.Properties[Keys.SQL_VIEW].GetValue(_taskHost).ToString(), -1);
+                cmbStoredProcedures.SelectedIndex = FindStringInComboBox(cmbStoredProcedures, _taskHost.Properties[Keys.SQL_StoredProcedure].GetValue(_taskHost).ToString(), -1);
+                cmbTables.SelectedIndex = FindStringInComboBox(cmbTables, _taskHost.Properties[Keys.SQL_TABLE].GetValue(_taskHost).ToString(), -1);
+
+                cmbDestination.SelectedIndex = FindStringInComboBox(cmbDestination, _taskHost.Properties[Keys.DESTINATION].GetValue(_taskHost).ToString(), -1);
+                cmbLogin.SelectedIndex = FindStringInComboBox(cmbLogin, _taskHost.Properties[Keys.SRV_LOGIN].GetValue(_taskHost).ToString(), -1);
+                cmbPassword.SelectedIndex = FindStringInComboBox(cmbDestination, _taskHost.Properties[Keys.SRV_PASSWORD].GetValue(_taskHost).ToString(), -1);
+                _isFirstLoad = false;
             }
             catch (Exception exception)
             {
@@ -68,10 +106,7 @@ namespace SSISBulkExportTask100
             }
         }
 
-        void grdParameters_DataError(object sender, DataGridViewDataErrorEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
+
         #endregion
 
         #region Methods
@@ -161,98 +196,163 @@ namespace SSISBulkExportTask100
 
         private void LoadDataBaseObjects()
         {
-            using (SqlConnection sqlConnection = new SqlConnection(_connections[cmbSQLServer.Text].ConnectionString))
+            Cursor = Cursors.WaitCursor;
+
+            using (var sqlConnection = new SqlConnection(EvaluateExpression(_connections[cmbSQLServer.Text].ConnectionString, _taskHost.VariableDispenser).ToString()))
             {
                 {
-                    using (SqlCommand sqlCommand = new SqlCommand(QueryResources.TABLES, sqlConnection))
+                    using (var sqlCommand = new SqlCommand(QueryResources.TABLES, sqlConnection))
                     {
-                        using (SqlDataReader sqlDataReaderTables = sqlCommand.ExecuteReader())
+                        using (var sqlDataReaderTables = sqlCommand.ExecuteReader())
                         {
                             cmbTables.Items.Clear();
 
-                            while (sqlDataReaderTables.Read())
-                            {
-                                cmbTables.Items.Add(sqlDataReaderTables.GetString(0));
-                            }
+                            if (sqlDataReaderTables != null)
+                                while (sqlDataReaderTables.Read())
+                                {
+                                    cmbTables.Items.Add(sqlDataReaderTables.GetString(0));
+                                }
                         }
                     }
                 }
 
                 {
-                    using (SqlCommand sqlCommand = new SqlCommand(QueryResources.VIEWS, sqlConnection))
+                    using (var sqlCommand = new SqlCommand(QueryResources.VIEWS, sqlConnection))
                     {
-                        using (SqlDataReader sqlDataReaderTables = sqlCommand.ExecuteReader())
+                        using (var sqlDataReaderTables = sqlCommand.ExecuteReader())
                         {
                             cmbViews.Items.Clear();
 
-                            while (sqlDataReaderTables.Read())
-                            {
-                                cmbViews.Items.Add(sqlDataReaderTables.GetString(0));
-                            }
+                            if (sqlDataReaderTables != null)
+                                while (sqlDataReaderTables.Read())
+                                {
+                                    cmbViews.Items.Add(sqlDataReaderTables.GetString(0));
+                                }
                         }
                     }
                 }
 
                 {
-                    using (SqlCommand sqlCommand = new SqlCommand(QueryResources.STORED_PROCEDURES, sqlConnection))
+                    using (var sqlCommand = new SqlCommand(QueryResources.STORED_PROCEDURES, sqlConnection))
                     {
-                        using (SqlDataReader sqlDataReaderTables = sqlCommand.ExecuteReader())
+                        using (var sqlDataReaderTables = sqlCommand.ExecuteReader())
                         {
                             cmbStoredProcedures.Items.Clear();
 
-                            while (sqlDataReaderTables.Read())
-                            {
-                                cmbStoredProcedures.Items.Add(sqlDataReaderTables.GetString(0));
-                            }
+                            if (sqlDataReaderTables != null)
+                                while (sqlDataReaderTables.Read())
+                                {
+                                    cmbStoredProcedures.Items.Add(sqlDataReaderTables.GetString(0));
+                                }
                         }
                     }
                 }
             }
+
+            Cursor = Cursors.Arrow;
         }
 
         private void LoadStoredProcedureParameters(string schema, string storedProcedureName)
         {
-            using (SqlConnection sqlConnection = new SqlConnection(_connections[cmbSQLServer.Text].ConnectionString))
+            Cursor = Cursors.WaitCursor;
+
+            using (var sqlConnection = new SqlConnection(EvaluateExpression(_connections[cmbSQLServer.Text].ConnectionString, _taskHost.VariableDispenser).ToString()))
             {
-                using (SqlCommand sqlCommand = new SqlCommand(string.Format(QueryResources.STORED_PROCEDURE_PARAMETERS, schema, storedProcedureName), sqlConnection))
+                using (var sqlCommand = new SqlCommand(string.Format(QueryResources.STORED_PROCEDURE_PARAMETERS, schema, storedProcedureName), sqlConnection))
                 {
-                    using (SqlDataReader sqlDataReaderTables = sqlCommand.ExecuteReader())
+                    using (var sqlDataReaderTables = sqlCommand.ExecuteReader())
                     {
                         grdParameters.Rows.Clear();
 
-                        int index;
+                        if (sqlDataReaderTables != null)
+                            while (sqlDataReaderTables.Read())
+                            {
+                                int index = grdParameters.Rows.Add();
 
-                        while (sqlDataReaderTables.Read())
+                                DataGridViewRow row = grdParameters.Rows[index];
+
+                                row.Cells["grdColParams"] = new DataGridViewTextBoxCell
+                                                                {
+                                                                    Value = sqlDataReaderTables.GetString(1)
+                                                                };
+
+                                row.Cells["grdColDirection"] = new DataGridViewTextBoxCell
+                                                                   {
+                                                                       Value = sqlDataReaderTables.GetString(2)
+                                                                   };
+
+                                row.Cells["grdColVars"] = LoadCellVariables();
+
+                                row.Cells["grdColExpression"] = new DataGridViewButtonCell();
+                            }
+                    }
+                }
+
+                if (_isFirstLoad)
+                {
+                    var mappingParams = (MappingParams)_taskHost.Properties[Keys.STORED_PROCEDURE_PARAMS].GetValue(_taskHost);
+
+                    foreach (MappingParam mappingParam in mappingParams)
+                    {
+                        foreach (DataGridViewRow row in grdParameters.Rows.Cast<DataGridViewRow>().Where(row => row.Cells[0].Value.ToString() == mappingParam.Name))
                         {
-                            index = grdParameters.Rows.Add();
-
-                            DataGridViewRow row = grdParameters.Rows[index];
-
-                            row.Cells["grdColParams"] = new DataGridViewTextBoxCell
-                                                            {
-                                                                Value = sqlDataReaderTables.GetString(1)
-                                                            };
-
-                            row.Cells["grdColDirection"] = new DataGridViewTextBoxCell
-                                                               {
-                                                                   Value = sqlDataReaderTables.GetString(2)
-                                                               };
-
-                            row.Cells["grdColVars"] = LoadCellVariables();
-
-                            row.Cells["grdColExpression"] = new DataGridViewButtonCell();
+                            row.Cells[2].Value = mappingParam.Value;
                         }
                     }
                 }
             }
+
+            Cursor = Cursors.Arrow;
         }
 
         #endregion
 
         #region Events
 
+        void grdParameters_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            //throw new NotImplementedException();
+        }
+
         private void btSave_Click(object sender, EventArgs e)
         {
+            _taskHost.Properties[Keys.SQL_SERVER].SetValue(_taskHost, cmbSQLServer.Text);
+            _taskHost.Properties[Keys.DESTINATION_FILE_CONNECTION].SetValue(_taskHost, optFileConnection.Checked ? "true" : "false");
+            _taskHost.Properties[Keys.DESTINATION].SetValue(_taskHost, cmbDestination.Text);
+
+            _taskHost.Properties[Keys.TRUSTED_CONNECTION].SetValue(_taskHost, chkTrustedConnection.Checked ? "true" : "false");
+            _taskHost.Properties[Keys.SRV_LOGIN].SetValue(_taskHost, !chkTrustedConnection.Checked ? cmbLogin.Text : string.Empty);
+            _taskHost.Properties[Keys.SRV_PASSWORD].SetValue(_taskHost, !chkTrustedConnection.Checked ? cmbPassword.Text : string.Empty);
+
+            _taskHost.Properties[Keys.NATIVE_DB_DATATYPE].SetValue(_taskHost, chkNativeDatabase.Checked ? "true" : "false");
+
+            _taskHost.Properties[Keys.FIRSTROW].SetValue(_taskHost, txFirstRow.Text.Trim());
+            _taskHost.Properties[Keys.LASTROW].SetValue(_taskHost, txLastRow.Text.Trim());
+
+            _taskHost.Properties[Keys.FIELD_TERMINATOR].SetValue(_taskHost, txFieldTerminator.Text.Trim());
+            _taskHost.Properties[Keys.ROW_TERMINATOR].SetValue(_taskHost, txRowTerminator.Text.Trim());
+
+            _taskHost.Properties[Keys.ACTIVATE_CMDSHELL].SetValue(_taskHost, chkRightsCMDSHELL.Checked ? "true" : "false");
+
+            _taskHost.Properties[Keys.SQL_STATEMENT].SetValue(_taskHost, txSQL.Text.Trim());
+            _taskHost.Properties[Keys.SQL_VIEW].SetValue(_taskHost, cmbViews.Text);
+            _taskHost.Properties[Keys.SQL_StoredProcedure].SetValue(_taskHost, cmbStoredProcedures.Text);
+            _taskHost.Properties[Keys.SQL_TABLE].SetValue(_taskHost, cmbTables.Text);
+
+
+            _taskHost.Properties[Keys.DATA_SOURCE].SetValue(_taskHost, tabControl.SelectedTab.Text);
+
+            var mappingParams = new MappingParams();
+            mappingParams.AddRange(from DataGridViewRow row in grdParameters.Rows
+                                   select new MappingParam
+                                   {
+                                       Name = row.Cells[0].Value.ToString(),
+                                       Type = row.Cells[1].Value.ToString(),
+                                       Value = row.Cells[5].Value.ToString()
+                                   });
+
+            _taskHost.Properties[Keys.STORED_PROCEDURE_PARAMS].SetValue(_taskHost, mappingParams);
+
             DialogResult = DialogResult.OK;
             Close();
         }
@@ -295,17 +395,51 @@ namespace SSISBulkExportTask100
             {
                 if (expressionBuilder.ShowDialog() == DialogResult.OK)
                 {
-                    cmdFileVariable.Text = expressionBuilder.Expression;
+                    cmbDestination.Text = expressionBuilder.Expression;
                 }
             }
         }
 
         private void cmbStoredProcedures_Click(object sender, EventArgs e)
         {
-            var interValue = cmbStoredProcedures.Text.Split(new [] { "].[" }, StringSplitOptions.None);
+            var interValue = cmbStoredProcedures.Text.Split(new[] { "].[" }, StringSplitOptions.None);
             string schema = interValue[0].Replace("[", string.Empty).Replace("]", string.Empty);
             string storedProcedure = interValue[1].Replace("[", string.Empty).Replace("]", string.Empty); ;
             LoadStoredProcedureParameters(schema, storedProcedure);
+        }
+
+        private void optFileConnection_CheckedChanged(object sender, EventArgs e)
+        {
+            LoadFileConnections();
+        }
+
+        private void optFileVariable_CheckedChanged(object sender, EventArgs e)
+        {
+            string selItem = string.Empty;
+            cmbDestination = LoadVariables("System.String", ref selItem);
+        }
+
+        private void grdParameters_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            switch (e.ColumnIndex)
+            {
+                case 3:
+                    {
+                        using (ExpressionBuilder expressionBuilder = ExpressionBuilder.Instantiate(_taskHost.Variables,
+                                                                                                _taskHost.VariableDispenser,
+                                                                                                Type.GetType("System.Object"),
+                                                                                                string.Empty))
+                        {
+                            if (expressionBuilder.ShowDialog() == DialogResult.OK)
+                            {
+                                ((DataGridViewComboBoxCell)grdParameters.Rows[e.RowIndex].Cells[e.ColumnIndex - 1]).Items.Add(expressionBuilder.Expression);
+                                grdParameters.Rows[e.RowIndex].Cells[e.ColumnIndex - 1].Value = expressionBuilder.Expression;
+                            }
+                        }
+                    }
+
+                    break;
+            }
         }
 
         #endregion

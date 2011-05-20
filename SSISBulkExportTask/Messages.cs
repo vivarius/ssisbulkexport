@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml;
-using System.Xml.Serialization;
 
 namespace SSISBulkExportTask100
 {
@@ -22,9 +20,19 @@ namespace SSISBulkExportTask100
         public const string SRV_PASSWORD = "Password";
         public const string DESTINATION = "DestinationPath";
         public const string DESTINATION_FILE_CONNECTION = "DestinationByFileConnection";
-        public const string DESTINATION_VARIABLE = "DestinationByVariable";
-    }
+        public const string ACTIVATE_CMDSHELL = "ActivateCmdShell";
+        public const string STORED_PROCEDURE_PARAMS = "StoredProcedureParameters";
 
+        public const string TRUE = "true";
+        public const string FALSE = "false";
+
+        public const string DATA_SOURCE = "DataSource";
+
+        public const string TAB_SQL = "SQL Statement";
+        public const string TAB_VIEW = "View";
+        public const string TAB_SP = "Stored Procedure";
+        public const string TAB_TABLES = "Tables";
+    }
 
     [Serializable]
     public class MappingParam
@@ -47,4 +55,32 @@ namespace SSISBulkExportTask100
         public const string STORED_PROCEDURE_PARAMETERS = "SELECT sys.objects.name spName, sys.parameters.name paramName, sys.types.name typeName  FROM sys.parameters INNER JOIN sys.objects ON sys.parameters.object_id = sys.objects.object_id INNER JOIN sys.types ON sys.types.user_type_id = sys.parameters.user_type_id INNER JOIN sys.schemas  ON sys.objects.schema_id = sys.schemas.schema_id AND sys.schemas.name = '{0}' WHERE sys.objects.name = '{1}'";
         public const string ENABLE_CMDSHELL = "EXEC master.dbo.sp_configure 'show advanced options', 1;RECONFIGURE;EXEC master.dbo.sp_configure 'xp_cmdshell', 1;RECONFIGURE;";
     }
+
+    public class BCP
+    {
+        private readonly string _bcp = " BCP ";
+
+        public string SQLServerInstance { get; set; }
+        public string DataSource { get; set; }
+        public string SQLStatment { get; set; }
+        public string View { get; set; }
+        public object StoredProcedure { get; set; }
+        public string Tables { get; set; }
+        public string FirstRow { get; set; }
+        public string LastRow { get; set; }
+        public string FieldTermiantor { get; set; }
+        public string RowTermiantor { get; set; }
+        public string NativeDatabaseDataType { get; set; }
+        public object TrustedConnection { get; set; }
+        public string Login { get; set; }
+        public string Password { get; set; }
+        public string DestinationPath { get; set; }
+        public string DestinationByFileConnection { get; set; }
+
+        public new string ToString()
+        {
+            return _bcp;
+        }
+    }
+
 }

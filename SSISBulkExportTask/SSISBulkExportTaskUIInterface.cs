@@ -3,8 +3,6 @@ using System.Windows.Forms;
 using Microsoft.SqlServer.Dts.Runtime;
 using Microsoft.SqlServer.Dts.Runtime.Design;
 
-
-
 namespace SSISBulkExportTask100
 {
     class SSISBulkExportTaskUIInterface : IDtsTaskUI
