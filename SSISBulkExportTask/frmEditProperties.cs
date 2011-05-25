@@ -47,6 +47,10 @@ namespace SSISBulkExportTask100
         {
             InitializeComponent();
 
+            _connections = connections;
+
+            //grdParameters.DataError += grdParameters_DataError(object sender, );
+
             _taskHost = taskHost;
             _isFirstLoad = true;
 
@@ -54,7 +58,7 @@ namespace SSISBulkExportTask100
             {
                 Cursor = Cursors.WaitCursor;
 
-                LoadDBConnections();
+                LoadDbConnections();
 
                 cmbSQLServer.SelectedIndex = FindStringInComboBox(cmbSQLServer, _taskHost.Properties[Keys.SQL_SERVER].GetValue(_taskHost).ToString(), -1);
 
@@ -66,10 +70,14 @@ namespace SSISBulkExportTask100
                 txSQL.Text = _taskHost.Properties[Keys.SQL_STATEMENT].GetValue(_taskHost).ToString();
 
                 if (_taskHost.Properties[Keys.DESTINATION_FILE_CONNECTION].GetValue(_taskHost).ToString() == Keys.TRUE)
-                    LoadFileConnections();
+                {
+                    optFileConnection.Checked = true;
+                    LoadFileConnectionsDestination();
+                }
                 else
                 {
                     string selItem = string.Empty;
+                    optFileVariable.Checked = true;
                     cmbDestination = LoadVariables("System.String", ref selItem);
                 }
 
@@ -77,22 +85,35 @@ namespace SSISBulkExportTask100
                 {
                     cmbLogin.Items.Clear();
                     cmbPassword.Items.Clear();
+                    chkTrustedConnection.Checked = true;
+                    cmbLogin.Enabled = false;
+                    cmbPassword.Enabled = false;
                 }
                 else
                 {
                     string selItem = string.Empty;
                     cmbPassword = cmbLogin = LoadVariables("System.String", ref selItem);
+                    chkTrustedConnection.Checked = false;
+                    cmbLogin.Enabled = true;
+                    cmbPassword.Enabled = true;
                 }
 
                 LoadDataBaseObjects();
+
+                txSQL.Text = _taskHost.Properties[Keys.SQL_STATEMENT].GetValue(_taskHost).ToString();
 
                 cmbViews.SelectedIndex = FindStringInComboBox(cmbViews, _taskHost.Properties[Keys.SQL_VIEW].GetValue(_taskHost).ToString(), -1);
                 cmbStoredProcedures.SelectedIndex = FindStringInComboBox(cmbStoredProcedures, _taskHost.Properties[Keys.SQL_StoredProcedure].GetValue(_taskHost).ToString(), -1);
                 cmbTables.SelectedIndex = FindStringInComboBox(cmbTables, _taskHost.Properties[Keys.SQL_TABLE].GetValue(_taskHost).ToString(), -1);
 
                 cmbDestination.SelectedIndex = FindStringInComboBox(cmbDestination, _taskHost.Properties[Keys.DESTINATION].GetValue(_taskHost).ToString(), -1);
+                cmbFormatFile.SelectedIndex = FindStringInComboBox(cmbFormatFile, _taskHost.Properties[Keys.FORMAT_FILE].GetValue(_taskHost).ToString(), -1);
                 cmbLogin.SelectedIndex = FindStringInComboBox(cmbLogin, _taskHost.Properties[Keys.SRV_LOGIN].GetValue(_taskHost).ToString(), -1);
                 cmbPassword.SelectedIndex = FindStringInComboBox(cmbDestination, _taskHost.Properties[Keys.SRV_PASSWORD].GetValue(_taskHost).ToString(), -1);
+
+                chkRightsCMDSHELL.Checked = (_taskHost.Properties[Keys.ACTIVATE_CMDSHELL].GetValue(_taskHost).ToString() == Keys.TRUE) ? true : false;
+
+
                 _isFirstLoad = false;
             }
             catch (Exception exception)
@@ -105,8 +126,6 @@ namespace SSISBulkExportTask100
                 Cursor = Cursors.Arrow;
             }
         }
-
-
         #endregion
 
         #region Methods
@@ -163,7 +182,7 @@ namespace SSISBulkExportTask100
             return variableObject;
         }
 
-        private void LoadFileConnections()
+        private void LoadFileConnectionsDestination()
         {
             cmbDestination.Items.Clear();
 
@@ -173,20 +192,36 @@ namespace SSISBulkExportTask100
             }
         }
 
-        private void LoadDBConnections()
+        private void LoadFileConnectionsFileFormat()
+        {
+            cmbFormatFile.Items.Clear();
+
+            foreach (var connection in Connections)
+            {
+                cmbFormatFile.Items.Add(connection.Name);
+            }
+        }
+
+        private void LoadDbConnections()
         {
             cmbSQLServer.Items.Clear();
 
-            foreach (var connection in Connections)
+            foreach (var connection in Connections.Cast<ConnectionManager>().Where(connection => connection.CreationName.Contains("ADO.NET")))
             {
                 cmbSQLServer.Items.Add(connection.Name);
             }
         }
 
-        private void LoadFileVariables()
+        private void LoadFileVariablesDestination()
         {
             cmbDestination.Items.Clear();
             cmbDestination.Items.AddRange(LoadVariables("System.String").ToArray());
+        }
+
+        private void LoadFileVariablesFileFormat()
+        {
+            cmbFormatFile.Items.Clear();
+            cmbFormatFile.Items.AddRange(LoadVariables("System.String").ToArray());
         }
 
         private List<string> LoadVariables(string parameterInfo)
@@ -200,6 +235,7 @@ namespace SSISBulkExportTask100
 
             using (var sqlConnection = new SqlConnection(EvaluateExpression(_connections[cmbSQLServer.Text].ConnectionString, _taskHost.VariableDispenser).ToString()))
             {
+                sqlConnection.Open();
                 {
                     using (var sqlCommand = new SqlCommand(QueryResources.TABLES, sqlConnection))
                     {
@@ -247,6 +283,7 @@ namespace SSISBulkExportTask100
                         }
                     }
                 }
+                sqlConnection.Close();
             }
 
             Cursor = Cursors.Arrow;
@@ -258,6 +295,8 @@ namespace SSISBulkExportTask100
 
             using (var sqlConnection = new SqlConnection(EvaluateExpression(_connections[cmbSQLServer.Text].ConnectionString, _taskHost.VariableDispenser).ToString()))
             {
+                sqlConnection.Open();
+
                 using (var sqlCommand = new SqlCommand(string.Format(QueryResources.STORED_PROCEDURE_PARAMETERS, schema, storedProcedureName), sqlConnection))
                 {
                     using (var sqlDataReaderTables = sqlCommand.ExecuteReader())
@@ -288,9 +327,11 @@ namespace SSISBulkExportTask100
                     }
                 }
 
+                sqlConnection.Close();
+
                 if (_isFirstLoad)
                 {
-                    var mappingParams = (MappingParams)_taskHost.Properties[Keys.STORED_PROCEDURE_PARAMS].GetValue(_taskHost);
+                    var mappingParams = (MappingParams)_taskHost.Properties[Keys.SQL_STORED_PROCEDURE_PARAMS].GetValue(_taskHost);
 
                     foreach (MappingParam mappingParam in mappingParams)
                     {
@@ -317,6 +358,10 @@ namespace SSISBulkExportTask100
         private void btSave_Click(object sender, EventArgs e)
         {
             _taskHost.Properties[Keys.SQL_SERVER].SetValue(_taskHost, cmbSQLServer.Text);
+
+            _taskHost.Properties[Keys.FORMAT_FILE_CONNECTION].SetValue(_taskHost, optFileFormatConnection.Checked ? "true" : "false");
+            _taskHost.Properties[Keys.FORMAT_FILE].SetValue(_taskHost, cmbFormatFile.Text);
+
             _taskHost.Properties[Keys.DESTINATION_FILE_CONNECTION].SetValue(_taskHost, optFileConnection.Checked ? "true" : "false");
             _taskHost.Properties[Keys.DESTINATION].SetValue(_taskHost, cmbDestination.Text);
 
@@ -339,6 +384,7 @@ namespace SSISBulkExportTask100
             _taskHost.Properties[Keys.SQL_StoredProcedure].SetValue(_taskHost, cmbStoredProcedures.Text);
             _taskHost.Properties[Keys.SQL_TABLE].SetValue(_taskHost, cmbTables.Text);
 
+            _taskHost.Properties[Keys.CODE_PAGE].SetValue(_taskHost, cmbCodePage.Text.Trim());
 
             _taskHost.Properties[Keys.DATA_SOURCE].SetValue(_taskHost, tabControl.SelectedTab.Text);
 
@@ -351,7 +397,11 @@ namespace SSISBulkExportTask100
                                        Value = row.Cells[5].Value.ToString()
                                    });
 
-            _taskHost.Properties[Keys.STORED_PROCEDURE_PARAMS].SetValue(_taskHost, mappingParams);
+            _taskHost.Properties[Keys.SQL_STORED_PROCEDURE_PARAMS].SetValue(_taskHost, mappingParams);
+
+            string val = (from d in _connections[cmbSQLServer.Text].ConnectionString.Split(';') where d == "Initial Catalog" select d).FirstOrDefault().ToString();
+
+            _taskHost.Properties[Keys.SQL_DATABASE].SetValue(_taskHost, string.Format("[{0}]", val.Split('=')[1]));
 
             DialogResult = DialogResult.OK;
             Close();
@@ -381,17 +431,17 @@ namespace SSISBulkExportTask100
 
         private void optFileConnection_Click(object sender, EventArgs e)
         {
-            LoadFileConnections();
+            LoadFileConnectionsDestination();
         }
 
         private void optFileVariable_Click(object sender, EventArgs e)
         {
-            LoadFileVariables();
+            LoadFileVariablesDestination();
         }
 
         private void cmdFileVariable_Click(object sender, EventArgs e)
         {
-            using (var expressionBuilder = ExpressionBuilder.Instantiate(_taskHost.Variables, _taskHost.VariableDispenser, Type.GetType("Sysytem.String"), cmdFileVariable.Text))
+            using (var expressionBuilder = ExpressionBuilder.Instantiate(_taskHost.Variables, _taskHost.VariableDispenser, Type.GetType("Sysytem.String"), cmbDestination.Text))
             {
                 if (expressionBuilder.ShowDialog() == DialogResult.OK)
                 {
@@ -400,7 +450,18 @@ namespace SSISBulkExportTask100
             }
         }
 
-        private void cmbStoredProcedures_Click(object sender, EventArgs e)
+        private void cmdFileFormatVariable_Click(object sender, EventArgs e)
+        {
+            using (var expressionBuilder = ExpressionBuilder.Instantiate(_taskHost.Variables, _taskHost.VariableDispenser, Type.GetType("Sysytem.String"), cmbFormatFile.Text))
+            {
+                if (expressionBuilder.ShowDialog() == DialogResult.OK)
+                {
+                    cmbFormatFile.Text = expressionBuilder.Expression;
+                }
+            }
+        }
+
+        private void cmbStoredProcedures_SelectedIndexChanged(object sender, EventArgs e)
         {
             var interValue = cmbStoredProcedures.Text.Split(new[] { "].[" }, StringSplitOptions.None);
             string schema = interValue[0].Replace("[", string.Empty).Replace("]", string.Empty);
@@ -410,13 +471,23 @@ namespace SSISBulkExportTask100
 
         private void optFileConnection_CheckedChanged(object sender, EventArgs e)
         {
-            LoadFileConnections();
+            LoadFileConnectionsDestination();
         }
 
         private void optFileVariable_CheckedChanged(object sender, EventArgs e)
         {
             string selItem = string.Empty;
             cmbDestination = LoadVariables("System.String", ref selItem);
+        }
+
+        private void optFileFormatConnection_CheckedChanged(object sender, EventArgs e)
+        {
+            LoadFileConnectionsFileFormat();
+        }
+
+        private void optFileFormatVariable_CheckedChanged(object sender, EventArgs e)
+        {
+            LoadFileVariablesFileFormat();
         }
 
         private void grdParameters_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -443,5 +514,7 @@ namespace SSISBulkExportTask100
         }
 
         #endregion
+
+
     }
 }

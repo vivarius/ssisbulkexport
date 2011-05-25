@@ -6,6 +6,11 @@ namespace SSISBulkExportTask100
 {
     class Serializer
     {
+        /// <summary>
+        /// Serializes to XML string.
+        /// </summary>
+        /// <param name="objectToSerialize">The object to serialize.</param>
+        /// <returns></returns>
         public static string SerializeToXmlString(object objectToSerialize)
         {
             if (objectToSerialize == null)
@@ -23,6 +28,12 @@ namespace SSISBulkExportTask100
             return new ASCIIEncoding().GetString(byteArray);
         }
 
+        /// <summary>
+        /// Des the serialize from XML string.
+        /// </summary>
+        /// <param name="typeToDeserialize">The type to deserialize.</param>
+        /// <param name="xmlString">The XML string.</param>
+        /// <returns></returns>
         public static object DeSerializeFromXmlString(System.Type typeToDeserialize, string xmlString)
         {
             if (string.IsNullOrEmpty(xmlString))

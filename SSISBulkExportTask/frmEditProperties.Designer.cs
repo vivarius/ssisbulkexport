@@ -29,8 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmEditProperties));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.cmbSQLServer = new System.Windows.Forms.ComboBox();
@@ -60,6 +59,9 @@
             this.optFileVariable = new System.Windows.Forms.RadioButton();
             this.btPreview = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cmbCodePage = new System.Windows.Forms.ComboBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.chkRightsCMDSHELL = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.cmbPassword = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
@@ -76,7 +78,11 @@
             this.label2 = new System.Windows.Forms.Label();
             this.txFirstRow = new System.Windows.Forms.TextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.chkRightsCMDSHELL = new System.Windows.Forms.CheckBox();
+            this.optFileFormatVariable = new System.Windows.Forms.RadioButton();
+            this.optFileFormatConnection = new System.Windows.Forms.RadioButton();
+            this.cmdFileFormatVariable = new System.Windows.Forms.Button();
+            this.label12 = new System.Windows.Forms.Label();
+            this.cmbFormatFile = new System.Windows.Forms.ComboBox();
             this.tabControl.SuspendLayout();
             this.tabSQL.SuspendLayout();
             this.tabView.SuspendLayout();
@@ -90,7 +96,7 @@
             // btSave
             // 
             this.btSave.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btSave.Location = new System.Drawing.Point(404, 504);
+            this.btSave.Location = new System.Drawing.Point(406, 563);
             this.btSave.Name = "btSave";
             this.btSave.Size = new System.Drawing.Size(75, 33);
             this.btSave.TabIndex = 32;
@@ -101,7 +107,7 @@
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(485, 504);
+            this.btnCancel.Location = new System.Drawing.Point(487, 563);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 33);
             this.btnCancel.TabIndex = 31;
@@ -111,9 +117,9 @@
             // cmbSQLServer
             // 
             this.cmbSQLServer.FormattingEnabled = true;
-            this.cmbSQLServer.Location = new System.Drawing.Point(93, 25);
+            this.cmbSQLServer.Location = new System.Drawing.Point(94, 25);
             this.cmbSQLServer.Name = "cmbSQLServer";
-            this.cmbSQLServer.Size = new System.Drawing.Size(420, 21);
+            this.cmbSQLServer.Size = new System.Drawing.Size(419, 21);
             this.cmbSQLServer.TabIndex = 0;
             // 
             // btGO
@@ -131,9 +137,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(13, 28);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(62, 13);
+            this.label1.Size = new System.Drawing.Size(65, 13);
             this.label1.TabIndex = 2;
-            this.label1.Text = "SQL Server";
+            this.label1.Text = "SQL Server:";
             // 
             // tabControl
             // 
@@ -141,10 +147,10 @@
             this.tabControl.Controls.Add(this.tabView);
             this.tabControl.Controls.Add(this.tabStoredProcedure);
             this.tabControl.Controls.Add(this.tabTables);
-            this.tabControl.Location = new System.Drawing.Point(16, 53);
+            this.tabControl.Location = new System.Drawing.Point(16, 52);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(545, 171);
+            this.tabControl.Size = new System.Drawing.Size(545, 172);
             this.tabControl.TabIndex = 33;
             // 
             // tabSQL
@@ -153,7 +159,7 @@
             this.tabSQL.Location = new System.Drawing.Point(4, 22);
             this.tabSQL.Name = "tabSQL";
             this.tabSQL.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSQL.Size = new System.Drawing.Size(537, 145);
+            this.tabSQL.Size = new System.Drawing.Size(537, 146);
             this.tabSQL.TabIndex = 0;
             this.tabSQL.Text = "SQL Statement";
             this.tabSQL.UseVisualStyleBackColor = true;
@@ -164,7 +170,7 @@
             this.txSQL.Location = new System.Drawing.Point(3, 3);
             this.txSQL.Multiline = true;
             this.txSQL.Name = "txSQL";
-            this.txSQL.Size = new System.Drawing.Size(531, 139);
+            this.txSQL.Size = new System.Drawing.Size(531, 140);
             this.txSQL.TabIndex = 0;
             // 
             // tabView
@@ -174,7 +180,7 @@
             this.tabView.Location = new System.Drawing.Point(4, 22);
             this.tabView.Name = "tabView";
             this.tabView.Padding = new System.Windows.Forms.Padding(3);
-            this.tabView.Size = new System.Drawing.Size(537, 145);
+            this.tabView.Size = new System.Drawing.Size(537, 146);
             this.tabView.TabIndex = 1;
             this.tabView.Text = "View";
             this.tabView.UseVisualStyleBackColor = true;
@@ -204,7 +210,7 @@
             this.tabStoredProcedure.Location = new System.Drawing.Point(4, 22);
             this.tabStoredProcedure.Name = "tabStoredProcedure";
             this.tabStoredProcedure.Padding = new System.Windows.Forms.Padding(3);
-            this.tabStoredProcedure.Size = new System.Drawing.Size(537, 145);
+            this.tabStoredProcedure.Size = new System.Drawing.Size(537, 146);
             this.tabStoredProcedure.TabIndex = 2;
             this.tabStoredProcedure.Text = "Stored Procedure";
             this.tabStoredProcedure.UseVisualStyleBackColor = true;
@@ -216,7 +222,7 @@
             this.cmbStoredProcedures.Name = "cmbStoredProcedures";
             this.cmbStoredProcedures.Size = new System.Drawing.Size(420, 21);
             this.cmbStoredProcedures.TabIndex = 28;
-            this.cmbStoredProcedures.Click += new System.EventHandler(this.cmbStoredProcedures_Click);
+            this.cmbStoredProcedures.SelectedIndexChanged += new System.EventHandler(this.cmbStoredProcedures_SelectedIndexChanged);
             // 
             // label5
             // 
@@ -238,10 +244,10 @@
             this.grdColVars,
             this.grdColExpression});
             this.grdParameters.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.grdParameters.Location = new System.Drawing.Point(3, 37);
+            this.grdParameters.Location = new System.Drawing.Point(3, 36);
             this.grdParameters.Name = "grdParameters";
             this.grdParameters.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.grdParameters.Size = new System.Drawing.Size(531, 105);
+            this.grdParameters.Size = new System.Drawing.Size(531, 107);
             this.grdParameters.TabIndex = 26;
             this.grdParameters.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.grdParameters_CellContentClick);
             // 
@@ -276,9 +282,9 @@
             // 
             // grdColExpression
             // 
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle3.Padding = new System.Windows.Forms.Padding(2);
-            this.grdColExpression.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.Padding = new System.Windows.Forms.Padding(2);
+            this.grdColExpression.DefaultCellStyle = dataGridViewCellStyle1;
             this.grdColExpression.HeaderText = "f(x)";
             this.grdColExpression.Name = "grdColExpression";
             this.grdColExpression.Resizable = System.Windows.Forms.DataGridViewTriState.False;
@@ -293,7 +299,7 @@
             this.tabTables.Location = new System.Drawing.Point(4, 22);
             this.tabTables.Name = "tabTables";
             this.tabTables.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTables.Size = new System.Drawing.Size(537, 145);
+            this.tabTables.Size = new System.Drawing.Size(537, 146);
             this.tabTables.TabIndex = 3;
             this.tabTables.Text = "Tables";
             this.tabTables.UseVisualStyleBackColor = true;
@@ -318,7 +324,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(13, 449);
+            this.label8.Location = new System.Drawing.Point(14, 455);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(60, 13);
             this.label8.TabIndex = 37;
@@ -327,14 +333,14 @@
             // cmbDestination
             // 
             this.cmbDestination.FormattingEnabled = true;
-            this.cmbDestination.Location = new System.Drawing.Point(92, 446);
+            this.cmbDestination.Location = new System.Drawing.Point(93, 452);
             this.cmbDestination.Name = "cmbDestination";
             this.cmbDestination.Size = new System.Drawing.Size(420, 21);
             this.cmbDestination.TabIndex = 36;
             // 
             // cmdFileVariable
             // 
-            this.cmdFileVariable.Location = new System.Drawing.Point(519, 444);
+            this.cmdFileVariable.Location = new System.Drawing.Point(520, 450);
             this.cmdFileVariable.Name = "cmdFileVariable";
             this.cmdFileVariable.Size = new System.Drawing.Size(42, 23);
             this.cmdFileVariable.TabIndex = 38;
@@ -346,7 +352,7 @@
             // 
             this.optFileConnection.AutoSize = true;
             this.optFileConnection.Checked = true;
-            this.optFileConnection.Location = new System.Drawing.Point(90, 473);
+            this.optFileConnection.Location = new System.Drawing.Point(91, 479);
             this.optFileConnection.Name = "optFileConnection";
             this.optFileConnection.Size = new System.Drawing.Size(98, 17);
             this.optFileConnection.TabIndex = 39;
@@ -359,7 +365,7 @@
             // optFileVariable
             // 
             this.optFileVariable.AutoSize = true;
-            this.optFileVariable.Location = new System.Drawing.Point(208, 473);
+            this.optFileVariable.Location = new System.Drawing.Point(209, 479);
             this.optFileVariable.Name = "optFileVariable";
             this.optFileVariable.Size = new System.Drawing.Size(128, 17);
             this.optFileVariable.TabIndex = 40;
@@ -379,6 +385,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.cmbCodePage);
+            this.groupBox1.Controls.Add(this.label13);
             this.groupBox1.Controls.Add(this.chkRightsCMDSHELL);
             this.groupBox1.Controls.Add(this.groupBox2);
             this.groupBox1.Controls.Add(this.txRowTerminator);
@@ -396,6 +404,38 @@
             this.groupBox1.TabIndex = 42;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Parameters";
+            // 
+            // cmbCodePage
+            // 
+            this.cmbCodePage.FormattingEnabled = true;
+            this.cmbCodePage.Items.AddRange(new object[] {
+            "",
+            "ACP",
+            "OEM",
+            "RAW"});
+            this.cmbCodePage.Location = new System.Drawing.Point(397, 20);
+            this.cmbCodePage.Name = "cmbCodePage";
+            this.cmbCodePage.Size = new System.Drawing.Size(138, 21);
+            this.cmbCodePage.TabIndex = 12;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(332, 25);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(59, 13);
+            this.label13.TabIndex = 11;
+            this.label13.Text = "Code page";
+            // 
+            // chkRightsCMDSHELL
+            // 
+            this.chkRightsCMDSHELL.AutoSize = true;
+            this.chkRightsCMDSHELL.Location = new System.Drawing.Point(397, 73);
+            this.chkRightsCMDSHELL.Name = "chkRightsCMDSHELL";
+            this.chkRightsCMDSHELL.Size = new System.Drawing.Size(136, 17);
+            this.chkRightsCMDSHELL.TabIndex = 10;
+            this.chkRightsCMDSHELL.Text = "Activate | xp_cmdshell |";
+            this.chkRightsCMDSHELL.UseVisualStyleBackColor = true;
             // 
             // groupBox2
             // 
@@ -467,7 +507,7 @@
             // 
             // txRowTerminator
             // 
-            this.txRowTerminator.Location = new System.Drawing.Point(408, 47);
+            this.txRowTerminator.Location = new System.Drawing.Point(245, 47);
             this.txRowTerminator.Name = "txRowTerminator";
             this.txRowTerminator.Size = new System.Drawing.Size(76, 20);
             this.txRowTerminator.TabIndex = 8;
@@ -475,7 +515,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(323, 51);
+            this.label9.Location = new System.Drawing.Point(160, 51);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(81, 13);
             this.label9.TabIndex = 7;
@@ -489,7 +529,7 @@
             ";",
             "|",
             "|^"});
-            this.txFieldTerminator.Location = new System.Drawing.Point(408, 21);
+            this.txFieldTerminator.Location = new System.Drawing.Point(245, 21);
             this.txFieldTerminator.Name = "txFieldTerminator";
             this.txFieldTerminator.Size = new System.Drawing.Size(76, 20);
             this.txFieldTerminator.TabIndex = 6;
@@ -497,7 +537,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(323, 25);
+            this.label4.Location = new System.Drawing.Point(160, 25);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(78, 13);
             this.label4.TabIndex = 5;
@@ -534,7 +574,6 @@
             this.label3.Size = new System.Drawing.Size(55, 13);
             this.label3.TabIndex = 2;
             this.label3.Text = "Last Row:";
-            this.toolTip1.SetToolTip(this.label3, resources.GetString("label3.ToolTip"));
             // 
             // label2
             // 
@@ -544,7 +583,6 @@
             this.label2.Size = new System.Drawing.Size(54, 13);
             this.label2.TabIndex = 1;
             this.label2.Text = "First Row:";
-            this.toolTip1.SetToolTip(this.label2, resources.GetString("label2.ToolTip"));
             // 
             // txFirstRow
             // 
@@ -553,21 +591,67 @@
             this.txFirstRow.Size = new System.Drawing.Size(76, 20);
             this.txFirstRow.TabIndex = 0;
             // 
-            // chkRightsCMDSHELL
+            // optFileFormatVariable
             // 
-            this.chkRightsCMDSHELL.AutoSize = true;
-            this.chkRightsCMDSHELL.Location = new System.Drawing.Point(326, 73);
-            this.chkRightsCMDSHELL.Name = "chkRightsCMDSHELL";
-            this.chkRightsCMDSHELL.Size = new System.Drawing.Size(136, 17);
-            this.chkRightsCMDSHELL.TabIndex = 10;
-            this.chkRightsCMDSHELL.Text = "Activate | xp_cmdshell |";
-            this.chkRightsCMDSHELL.UseVisualStyleBackColor = true;
+            this.optFileFormatVariable.AutoSize = true;
+            this.optFileFormatVariable.Location = new System.Drawing.Point(209, 539);
+            this.optFileFormatVariable.Name = "optFileFormatVariable";
+            this.optFileFormatVariable.Size = new System.Drawing.Size(128, 17);
+            this.optFileFormatVariable.TabIndex = 47;
+            this.optFileFormatVariable.Text = "Variable / Expression ";
+            this.optFileFormatVariable.UseVisualStyleBackColor = true;
+            this.optFileFormatVariable.CheckedChanged += new System.EventHandler(this.optFileFormatVariable_CheckedChanged);
+            // 
+            // optFileFormatConnection
+            // 
+            this.optFileFormatConnection.AutoSize = true;
+            this.optFileFormatConnection.Checked = true;
+            this.optFileFormatConnection.Location = new System.Drawing.Point(91, 539);
+            this.optFileFormatConnection.Name = "optFileFormatConnection";
+            this.optFileFormatConnection.Size = new System.Drawing.Size(98, 17);
+            this.optFileFormatConnection.TabIndex = 46;
+            this.optFileFormatConnection.TabStop = true;
+            this.optFileFormatConnection.Text = "File Connection";
+            this.optFileFormatConnection.UseVisualStyleBackColor = true;
+            this.optFileFormatConnection.CheckedChanged += new System.EventHandler(this.optFileFormatConnection_CheckedChanged);
+            // 
+            // cmdFileFormatVariable
+            // 
+            this.cmdFileFormatVariable.Location = new System.Drawing.Point(520, 510);
+            this.cmdFileFormatVariable.Name = "cmdFileFormatVariable";
+            this.cmdFileFormatVariable.Size = new System.Drawing.Size(42, 23);
+            this.cmdFileFormatVariable.TabIndex = 45;
+            this.cmdFileFormatVariable.Text = "f(x)";
+            this.cmdFileFormatVariable.UseVisualStyleBackColor = true;
+            this.cmdFileFormatVariable.Click += new System.EventHandler(this.cmdFileFormatVariable_Click);
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(14, 515);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(55, 13);
+            this.label12.TabIndex = 44;
+            this.label12.Text = "Format file";
+            // 
+            // cmbFormatFile
+            // 
+            this.cmbFormatFile.FormattingEnabled = true;
+            this.cmbFormatFile.Location = new System.Drawing.Point(93, 512);
+            this.cmbFormatFile.Name = "cmbFormatFile";
+            this.cmbFormatFile.Size = new System.Drawing.Size(420, 21);
+            this.cmbFormatFile.TabIndex = 43;
             // 
             // frmEditProperties
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(573, 544);
+            this.ClientSize = new System.Drawing.Size(573, 607);
+            this.Controls.Add(this.optFileFormatVariable);
+            this.Controls.Add(this.optFileFormatConnection);
+            this.Controls.Add(this.cmdFileFormatVariable);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.cmbFormatFile);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btPreview);
             this.Controls.Add(this.optFileVariable);
@@ -581,7 +665,6 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btGO);
             this.Controls.Add(this.cmbSQLServer);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "frmEditProperties";
@@ -655,6 +738,13 @@
         private System.Windows.Forms.ComboBox cmbLogin;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.CheckBox chkRightsCMDSHELL;
+        private System.Windows.Forms.RadioButton optFileFormatVariable;
+        private System.Windows.Forms.RadioButton optFileFormatConnection;
+        private System.Windows.Forms.Button cmdFileFormatVariable;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.ComboBox cmbFormatFile;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.ComboBox cmbCodePage;
 
     }
 }
