@@ -52,11 +52,6 @@
             this.tabTables = new System.Windows.Forms.TabPage();
             this.cmbTables = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.cmbDestination = new System.Windows.Forms.ComboBox();
-            this.cmdFileVariable = new System.Windows.Forms.Button();
-            this.optFileConnection = new System.Windows.Forms.RadioButton();
-            this.optFileVariable = new System.Windows.Forms.RadioButton();
             this.btPreview = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.cmbCodePage = new System.Windows.Forms.ComboBox();
@@ -78,6 +73,13 @@
             this.label2 = new System.Windows.Forms.Label();
             this.txFirstRow = new System.Windows.Forms.TextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.optFileVariable = new System.Windows.Forms.RadioButton();
+            this.optFileConnection = new System.Windows.Forms.RadioButton();
+            this.cmdFileVariable = new System.Windows.Forms.Button();
+            this.label8 = new System.Windows.Forms.Label();
+            this.cmbDestination = new System.Windows.Forms.ComboBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.optFileFormatVariable = new System.Windows.Forms.RadioButton();
             this.optFileFormatConnection = new System.Windows.Forms.RadioButton();
             this.cmdFileFormatVariable = new System.Windows.Forms.Button();
@@ -91,12 +93,14 @@
             this.tabTables.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // btSave
             // 
             this.btSave.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btSave.Location = new System.Drawing.Point(406, 563);
+            this.btSave.Location = new System.Drawing.Point(404, 568);
             this.btSave.Name = "btSave";
             this.btSave.Size = new System.Drawing.Size(75, 33);
             this.btSave.TabIndex = 32;
@@ -107,7 +111,7 @@
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(487, 563);
+            this.btnCancel.Location = new System.Drawing.Point(485, 568);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 33);
             this.btnCancel.TabIndex = 31;
@@ -117,14 +121,14 @@
             // cmbSQLServer
             // 
             this.cmbSQLServer.FormattingEnabled = true;
-            this.cmbSQLServer.Location = new System.Drawing.Point(94, 25);
+            this.cmbSQLServer.Location = new System.Drawing.Point(93, 6);
             this.cmbSQLServer.Name = "cmbSQLServer";
             this.cmbSQLServer.Size = new System.Drawing.Size(419, 21);
             this.cmbSQLServer.TabIndex = 0;
             // 
             // btGO
             // 
-            this.btGO.Location = new System.Drawing.Point(519, 23);
+            this.btGO.Location = new System.Drawing.Point(518, 4);
             this.btGO.Name = "btGO";
             this.btGO.Size = new System.Drawing.Size(42, 23);
             this.btGO.TabIndex = 1;
@@ -135,7 +139,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 28);
+            this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(65, 13);
             this.label1.TabIndex = 2;
@@ -147,7 +151,7 @@
             this.tabControl.Controls.Add(this.tabView);
             this.tabControl.Controls.Add(this.tabStoredProcedure);
             this.tabControl.Controls.Add(this.tabTables);
-            this.tabControl.Location = new System.Drawing.Point(16, 52);
+            this.tabControl.Location = new System.Drawing.Point(15, 33);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
             this.tabControl.Size = new System.Drawing.Size(545, 172);
@@ -170,6 +174,7 @@
             this.txSQL.Location = new System.Drawing.Point(3, 3);
             this.txSQL.Multiline = true;
             this.txSQL.Name = "txSQL";
+            this.txSQL.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txSQL.Size = new System.Drawing.Size(531, 140);
             this.txSQL.TabIndex = 0;
             // 
@@ -321,62 +326,9 @@
             this.label7.TabIndex = 31;
             this.label7.Text = "Tables:";
             // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(14, 455);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(60, 13);
-            this.label8.TabIndex = 37;
-            this.label8.Text = "Destination";
-            // 
-            // cmbDestination
-            // 
-            this.cmbDestination.FormattingEnabled = true;
-            this.cmbDestination.Location = new System.Drawing.Point(93, 452);
-            this.cmbDestination.Name = "cmbDestination";
-            this.cmbDestination.Size = new System.Drawing.Size(420, 21);
-            this.cmbDestination.TabIndex = 36;
-            // 
-            // cmdFileVariable
-            // 
-            this.cmdFileVariable.Location = new System.Drawing.Point(520, 450);
-            this.cmdFileVariable.Name = "cmdFileVariable";
-            this.cmdFileVariable.Size = new System.Drawing.Size(42, 23);
-            this.cmdFileVariable.TabIndex = 38;
-            this.cmdFileVariable.Text = "f(x)";
-            this.cmdFileVariable.UseVisualStyleBackColor = true;
-            this.cmdFileVariable.Click += new System.EventHandler(this.cmdFileVariable_Click);
-            // 
-            // optFileConnection
-            // 
-            this.optFileConnection.AutoSize = true;
-            this.optFileConnection.Checked = true;
-            this.optFileConnection.Location = new System.Drawing.Point(91, 479);
-            this.optFileConnection.Name = "optFileConnection";
-            this.optFileConnection.Size = new System.Drawing.Size(98, 17);
-            this.optFileConnection.TabIndex = 39;
-            this.optFileConnection.TabStop = true;
-            this.optFileConnection.Text = "File Connection";
-            this.optFileConnection.UseVisualStyleBackColor = true;
-            this.optFileConnection.CheckedChanged += new System.EventHandler(this.optFileConnection_CheckedChanged);
-            this.optFileConnection.Click += new System.EventHandler(this.optFileConnection_Click);
-            // 
-            // optFileVariable
-            // 
-            this.optFileVariable.AutoSize = true;
-            this.optFileVariable.Location = new System.Drawing.Point(209, 479);
-            this.optFileVariable.Name = "optFileVariable";
-            this.optFileVariable.Size = new System.Drawing.Size(128, 17);
-            this.optFileVariable.TabIndex = 40;
-            this.optFileVariable.Text = "Variable / Expression ";
-            this.optFileVariable.UseVisualStyleBackColor = true;
-            this.optFileVariable.CheckedChanged += new System.EventHandler(this.optFileVariable_CheckedChanged);
-            this.optFileVariable.Click += new System.EventHandler(this.optFileVariable_Click);
-            // 
             // btPreview
             // 
-            this.btPreview.Location = new System.Drawing.Point(485, 230);
+            this.btPreview.Location = new System.Drawing.Point(484, 211);
             this.btPreview.Name = "btPreview";
             this.btPreview.Size = new System.Drawing.Size(75, 23);
             this.btPreview.TabIndex = 41;
@@ -398,7 +350,7 @@
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.txFirstRow);
-            this.groupBox1.Location = new System.Drawing.Point(16, 259);
+            this.groupBox1.Location = new System.Drawing.Point(15, 240);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(545, 179);
             this.groupBox1.TabIndex = 42;
@@ -503,6 +455,7 @@
                     "ecurity credentials of the network user, login_id, and password are not required" +
                     ". \r\n");
             this.chkTrustedConnection.UseVisualStyleBackColor = true;
+            this.chkTrustedConnection.CheckedChanged += new System.EventHandler(this.chkTrustedConnection_CheckedChanged);
             this.chkTrustedConnection.Click += new System.EventHandler(this.chkTrustedConnection_Click);
             // 
             // txRowTerminator
@@ -591,36 +544,117 @@
             this.txFirstRow.Size = new System.Drawing.Size(76, 20);
             this.txFirstRow.TabIndex = 0;
             // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.optFileVariable);
+            this.groupBox3.Controls.Add(this.optFileConnection);
+            this.groupBox3.Controls.Add(this.cmdFileVariable);
+            this.groupBox3.Controls.Add(this.label8);
+            this.groupBox3.Controls.Add(this.cmbDestination);
+            this.groupBox3.Location = new System.Drawing.Point(15, 421);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(545, 64);
+            this.groupBox3.TabIndex = 48;
+            this.groupBox3.TabStop = false;
+            // 
+            // optFileVariable
+            // 
+            this.optFileVariable.AutoSize = true;
+            this.optFileVariable.Location = new System.Drawing.Point(194, 39);
+            this.optFileVariable.Name = "optFileVariable";
+            this.optFileVariable.Size = new System.Drawing.Size(128, 17);
+            this.optFileVariable.TabIndex = 45;
+            this.optFileVariable.Text = "Variable / Expression ";
+            this.optFileVariable.UseVisualStyleBackColor = true;
+            this.optFileVariable.CheckedChanged += new System.EventHandler(this.optFileVariable_CheckedChanged_1);
+            this.optFileVariable.Click += new System.EventHandler(this.optFileVariable_Click);
+            // 
+            // optFileConnection
+            // 
+            this.optFileConnection.AutoSize = true;
+            this.optFileConnection.Checked = true;
+            this.optFileConnection.Location = new System.Drawing.Point(76, 39);
+            this.optFileConnection.Name = "optFileConnection";
+            this.optFileConnection.Size = new System.Drawing.Size(98, 17);
+            this.optFileConnection.TabIndex = 44;
+            this.optFileConnection.TabStop = true;
+            this.optFileConnection.Text = "File Connection";
+            this.optFileConnection.UseVisualStyleBackColor = true;
+            this.optFileConnection.CheckedChanged += new System.EventHandler(this.optFileConnection_CheckedChanged_1);
+            this.optFileConnection.Click += new System.EventHandler(this.optFileConnection_Click);
+            // 
+            // cmdFileVariable
+            // 
+            this.cmdFileVariable.Location = new System.Drawing.Point(505, 10);
+            this.cmdFileVariable.Name = "cmdFileVariable";
+            this.cmdFileVariable.Size = new System.Drawing.Size(36, 23);
+            this.cmdFileVariable.TabIndex = 43;
+            this.cmdFileVariable.Text = "f(x)";
+            this.cmdFileVariable.UseVisualStyleBackColor = true;
+            this.cmdFileVariable.Click += new System.EventHandler(this.cmdFileVariable_Click);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(12, 15);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(60, 13);
+            this.label8.TabIndex = 42;
+            this.label8.Text = "Destination";
+            // 
+            // cmbDestination
+            // 
+            this.cmbDestination.FormattingEnabled = true;
+            this.cmbDestination.Location = new System.Drawing.Point(78, 12);
+            this.cmbDestination.Name = "cmbDestination";
+            this.cmbDestination.Size = new System.Drawing.Size(420, 21);
+            this.cmbDestination.TabIndex = 41;
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.optFileFormatVariable);
+            this.groupBox4.Controls.Add(this.optFileFormatConnection);
+            this.groupBox4.Controls.Add(this.cmdFileFormatVariable);
+            this.groupBox4.Controls.Add(this.label12);
+            this.groupBox4.Controls.Add(this.cmbFormatFile);
+            this.groupBox4.Location = new System.Drawing.Point(15, 491);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(545, 71);
+            this.groupBox4.TabIndex = 49;
+            this.groupBox4.TabStop = false;
+            // 
             // optFileFormatVariable
             // 
             this.optFileFormatVariable.AutoSize = true;
-            this.optFileFormatVariable.Location = new System.Drawing.Point(209, 539);
+            this.optFileFormatVariable.Location = new System.Drawing.Point(198, 46);
             this.optFileFormatVariable.Name = "optFileFormatVariable";
             this.optFileFormatVariable.Size = new System.Drawing.Size(128, 17);
-            this.optFileFormatVariable.TabIndex = 47;
+            this.optFileFormatVariable.TabIndex = 52;
             this.optFileFormatVariable.Text = "Variable / Expression ";
             this.optFileFormatVariable.UseVisualStyleBackColor = true;
-            this.optFileFormatVariable.CheckedChanged += new System.EventHandler(this.optFileFormatVariable_CheckedChanged);
+            this.optFileFormatVariable.CheckedChanged += new System.EventHandler(this.optFileFormatVariable_CheckedChanged_1);
+            this.optFileFormatVariable.Click += new System.EventHandler(this.optFileFormatVariable_CheckedChanged);
             // 
             // optFileFormatConnection
             // 
             this.optFileFormatConnection.AutoSize = true;
             this.optFileFormatConnection.Checked = true;
-            this.optFileFormatConnection.Location = new System.Drawing.Point(91, 539);
+            this.optFileFormatConnection.Location = new System.Drawing.Point(80, 46);
             this.optFileFormatConnection.Name = "optFileFormatConnection";
             this.optFileFormatConnection.Size = new System.Drawing.Size(98, 17);
-            this.optFileFormatConnection.TabIndex = 46;
+            this.optFileFormatConnection.TabIndex = 51;
             this.optFileFormatConnection.TabStop = true;
             this.optFileFormatConnection.Text = "File Connection";
             this.optFileFormatConnection.UseVisualStyleBackColor = true;
-            this.optFileFormatConnection.CheckedChanged += new System.EventHandler(this.optFileFormatConnection_CheckedChanged);
+            this.optFileFormatConnection.CheckedChanged += new System.EventHandler(this.optFileFormatConnection_CheckedChanged_1);
+            this.optFileFormatConnection.ChangeUICues += new System.Windows.Forms.UICuesEventHandler(this.optFileFormatConnection_CheckedChanged);
             // 
             // cmdFileFormatVariable
             // 
-            this.cmdFileFormatVariable.Location = new System.Drawing.Point(520, 510);
+            this.cmdFileFormatVariable.Location = new System.Drawing.Point(505, 17);
             this.cmdFileFormatVariable.Name = "cmdFileFormatVariable";
-            this.cmdFileFormatVariable.Size = new System.Drawing.Size(42, 23);
-            this.cmdFileFormatVariable.TabIndex = 45;
+            this.cmdFileFormatVariable.Size = new System.Drawing.Size(36, 23);
+            this.cmdFileFormatVariable.TabIndex = 50;
             this.cmdFileFormatVariable.Text = "f(x)";
             this.cmdFileFormatVariable.UseVisualStyleBackColor = true;
             this.cmdFileFormatVariable.Click += new System.EventHandler(this.cmdFileFormatVariable_Click);
@@ -628,37 +662,29 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(14, 515);
+            this.label12.Location = new System.Drawing.Point(16, 22);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(55, 13);
-            this.label12.TabIndex = 44;
+            this.label12.TabIndex = 49;
             this.label12.Text = "Format file";
             // 
             // cmbFormatFile
             // 
             this.cmbFormatFile.FormattingEnabled = true;
-            this.cmbFormatFile.Location = new System.Drawing.Point(93, 512);
+            this.cmbFormatFile.Location = new System.Drawing.Point(82, 19);
             this.cmbFormatFile.Name = "cmbFormatFile";
             this.cmbFormatFile.Size = new System.Drawing.Size(420, 21);
-            this.cmbFormatFile.TabIndex = 43;
+            this.cmbFormatFile.TabIndex = 48;
             // 
             // frmEditProperties
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(573, 607);
-            this.Controls.Add(this.optFileFormatVariable);
-            this.Controls.Add(this.optFileFormatConnection);
-            this.Controls.Add(this.cmdFileFormatVariable);
-            this.Controls.Add(this.label12);
-            this.Controls.Add(this.cmbFormatFile);
+            this.ClientSize = new System.Drawing.Size(572, 609);
+            this.Controls.Add(this.groupBox4);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btPreview);
-            this.Controls.Add(this.optFileVariable);
-            this.Controls.Add(this.optFileConnection);
-            this.Controls.Add(this.cmdFileVariable);
-            this.Controls.Add(this.label8);
-            this.Controls.Add(this.cmbDestination);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.btSave);
             this.Controls.Add(this.btnCancel);
@@ -685,6 +711,10 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -714,11 +744,6 @@
         private System.Windows.Forms.TabPage tabTables;
         private System.Windows.Forms.ComboBox cmbTables;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.ComboBox cmbDestination;
-        private System.Windows.Forms.Button cmdFileVariable;
-        private System.Windows.Forms.RadioButton optFileConnection;
-        private System.Windows.Forms.RadioButton optFileVariable;
         private System.Windows.Forms.Button btPreview;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
@@ -738,13 +763,20 @@
         private System.Windows.Forms.ComboBox cmbLogin;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.CheckBox chkRightsCMDSHELL;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.ComboBox cmbCodePage;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.RadioButton optFileVariable;
+        private System.Windows.Forms.RadioButton optFileConnection;
+        private System.Windows.Forms.Button cmdFileVariable;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.ComboBox cmbDestination;
+        private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.RadioButton optFileFormatVariable;
         private System.Windows.Forms.RadioButton optFileFormatConnection;
         private System.Windows.Forms.Button cmdFileFormatVariable;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.ComboBox cmbFormatFile;
-        private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.ComboBox cmbCodePage;
 
     }
 }

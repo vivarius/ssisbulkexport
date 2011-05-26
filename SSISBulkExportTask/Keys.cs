@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.SqlServer.Dts.Runtime;
 using Microsoft.SqlServer.Dts.Runtime.Wrapper;
 using VariableDispenser = Microsoft.SqlServer.Dts.Runtime.VariableDispenser;
@@ -70,11 +71,10 @@ namespace SSISBulkExportTask100
     {
         #region Private members
 
-        private const string bcp = " BCP ";
-        private const string activateCmdShell = " master..xp_cmdshell ";
-        private VariableDispenser _variableDispenser;
-        private Connections _connection;
-        private readonly StringBuilder stringBuilder = new StringBuilder();
+        private const string activateCmdShell = " EXEC master..xp_cmdshell ";
+        private readonly VariableDispenser _variableDispenser;
+        private readonly Connections _connection;
+        private readonly StringBuilder _stringBuilder = new StringBuilder();
         #endregion
 
         #region Public Properties
@@ -149,15 +149,15 @@ namespace SSISBulkExportTask100
         public new string ToString()
         {
 
-            stringBuilder.Append(activateCmdShell);
-            stringBuilder.Append(bcp);
+            _stringBuilder.Append(activateCmdShell);
+            _stringBuilder.Append("'bcp ");
 
             switch (DataSource)
             {
-                case Keys.SQL_STATEMENT:
-                    stringBuilder.Append(string.Format(@" ""{0}"" queryout ", SQLStatment));
+                case Keys.TAB_SQL:
+                    _stringBuilder.Append(string.Format(@" ""{0}"" queryout ", Regex.Replace(SQLStatment, "(\n|\r)+", string.Empty)));
                     break;
-                case Keys.SQL_StoredProcedure:
+                case Keys.TAB_SP:
                     StringBuilder storedProcParams = new StringBuilder();
 
                     int index = 0;
@@ -172,74 +172,83 @@ namespace SSISBulkExportTask100
                         index++;
                     }
 
-                    stringBuilder.Append(string.Format(@" ""exec {0} {1}"" queryout ", StoredProcedure, storedProcParams));
+                    _stringBuilder.Append(string.Format(@" ""set fmtonly off exec {0}.{1} {2}"" queryout ", Database.Trim(), StoredProcedure.Trim(), storedProcParams));
                     break;
-                case Keys.SQL_VIEW:
-                    stringBuilder.Append(string.Format(@" ""{0} "" out ", View));
+                case Keys.TAB_VIEW:
+                    _stringBuilder.Append(string.Format(@" ""{0}.{1}"" out ", Database.Trim(), View.Trim()));
                     break;
-                case Keys.SQL_TABLE:
-                    stringBuilder.Append(string.Format(@" ""{0} "" out ", Tables));
+                case Keys.TAB_TABLES:
+                    _stringBuilder.Append(string.Format(@" ""{0}.{1}"" out ", Database.Trim(), Tables.Trim()));
                     break;
             }
 
-            stringBuilder.Append(DestinationByFileConnection == Keys.TRUE
+            _stringBuilder.Append(DestinationByFileConnection.Trim() == Keys.TRUE
                                      ? string.Format(@" ""{0}"" ", _connection[DestinationPath].ConnectionString)
                                      : string.Format(@" ""{0}"" ", EvaluateExpression(DestinationPath, _variableDispenser)));
 
 
-            string srvVal = (from d in _connection[SQLServerInstance].ConnectionString.Split(';') where d == "Data Source" select d).FirstOrDefault();
+            string srvVal = (from srv in _connection[SQLServerInstance].ConnectionString.Split(';')
+                             where srv.Contains("Data Source")
+                             select srv).FirstOrDefault();
 
-            stringBuilder.Append(string.Format(" -S {0}", srvVal.Split('=')[1]));
+            if (srvVal != null)
+                _stringBuilder.Append(string.Format(" -S{0}", srvVal.Split('=')[1]));
 
-            stringBuilder.Append(TrustedConnection == Keys.TRUSTED_CONNECTION
+            _stringBuilder.Append(TrustedConnection.Trim() == Keys.TRUE
                                      ? " -T "
-                                     : string.Format(" -U {0} -P {1} ",
+                                     : string.Format(" -U{0} -P{1} ",
                                                      EvaluateExpression(Login, _variableDispenser),
                                                      EvaluateExpression(Password, _variableDispenser)));
 
-            if (!string.IsNullOrEmpty(Database))
+            //if (!string.IsNullOrEmpty(Database))
+            //{
+            //    _stringBuilder.Append(string.Format(" -d [{0}]", Database));
+            //}
+
+            if (!string.IsNullOrEmpty(FirstRow.Trim()))
             {
-                stringBuilder.Append(string.Format(" -d [{0}]", Database));
+                _stringBuilder.Append(string.Format(" -F{0}", FirstRow));
             }
 
-            if (!string.IsNullOrEmpty(FirstRow))
+            if (!string.IsNullOrEmpty(LastRow.Trim()))
             {
-                stringBuilder.Append(string.Format(" -F {0}", FirstRow));
-            }
-
-            if (!string.IsNullOrEmpty(LastRow))
-            {
-                stringBuilder.Append(string.Format(" -L {0}", LastRow));
+                _stringBuilder.Append(string.Format(" -L{0}", LastRow));
             }
 
             if (NativeDatabaseDataType == Keys.TRUE)
             {
-                stringBuilder.Append(" -N ");
+                _stringBuilder.Append(" -N ");
             }
 
-            if (!string.IsNullOrEmpty(FormatFile))
+            if (!string.IsNullOrEmpty(FormatFile.Trim()))
             {
-                stringBuilder.Append(FormatFileByFileConnection == Keys.TRUE
-                         ? string.Format(@" -f ""{0}"" ", _connection[FormatFile].ConnectionString)
-                         : string.Format(@" -f ""{0}"" ", EvaluateExpression(FormatFile, _variableDispenser)));
+                _stringBuilder.Append(FormatFileByFileConnection == Keys.TRUE
+                         ? string.Format(@" -f""{0}"" ", _connection[FormatFile].ConnectionString)
+                         : string.Format(@" -f""{0}"" ", EvaluateExpression(FormatFile, _variableDispenser)));
             }
-
-            if (!string.IsNullOrEmpty(FieldTermiantor))
+            else
             {
-                stringBuilder.Append(string.Format(" -t {0} ", FieldTermiantor));
+                _stringBuilder.Append(" -c ");
             }
 
-            if (!string.IsNullOrEmpty(RowTermiantor))
+            if (!string.IsNullOrEmpty(FieldTermiantor.Trim()))
             {
-                stringBuilder.Append(string.Format(" -r {0} ", RowTermiantor));
+                _stringBuilder.Append(string.Format(" -t{0} ", FieldTermiantor));
             }
 
-            if (!string.IsNullOrEmpty(CodePage))
+            if (!string.IsNullOrEmpty(RowTermiantor.Trim()))
             {
-                stringBuilder.Append(string.Format(" -C {0} ", CodePage));
+                _stringBuilder.Append(string.Format(" -r{0} ", RowTermiantor));
             }
 
-            return stringBuilder.ToString();
+            if (!string.IsNullOrEmpty(CodePage.Trim()))
+            {
+                _stringBuilder.Append(string.Format(" -C{0} ", CodePage));
+            }
+
+            _stringBuilder.Append("'");
+
+            return _stringBuilder.ToString();
         }
 
         #endregion

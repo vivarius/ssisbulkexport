@@ -58,61 +58,133 @@ namespace SSISBulkExportTask100
             {
                 Cursor = Cursors.WaitCursor;
 
+                optFileVariable.CheckedChanged -= (optFileVariable_CheckedChanged_1);
+                optFileVariable.Click -= (optFileVariable_Click);
+                optFileConnection.CheckedChanged -= (optFileConnection_CheckedChanged_1);
+                cmdFileVariable.Click -= (cmdFileVariable_Click);
+                optFileFormatVariable.CheckedChanged -= (optFileFormatVariable_CheckedChanged_1);
+                optFileFormatVariable.Click -= (optFileFormatVariable_CheckedChanged);
+                optFileFormatConnection.CheckedChanged -= (optFileFormatConnection_CheckedChanged_1);
+                optFileFormatConnection.ChangeUICues -= (optFileFormatConnection_CheckedChanged);
+
                 LoadDbConnections();
 
-                cmbSQLServer.SelectedIndex = FindStringInComboBox(cmbSQLServer, _taskHost.Properties[Keys.SQL_SERVER].GetValue(_taskHost).ToString(), -1);
+                if (_taskHost.Properties[Keys.SQL_SERVER].GetValue(_taskHost) != null)
+                {
+                    cmbSQLServer.SelectedIndex = FindStringInComboBox(cmbSQLServer, _taskHost.Properties[Keys.SQL_SERVER].GetValue(_taskHost).ToString(), -1);
 
-                txFirstRow.Text = _taskHost.Properties[Keys.FIRSTROW].GetValue(_taskHost).ToString();
-                txLastRow.Text = _taskHost.Properties[Keys.LASTROW].GetValue(_taskHost).ToString();
-                txFieldTerminator.Text = _taskHost.Properties[Keys.FIELD_TERMINATOR].GetValue(_taskHost).ToString();
-                txRowTerminator.Text = _taskHost.Properties[Keys.ROW_TERMINATOR].GetValue(_taskHost).ToString();
+                    if (!string.IsNullOrEmpty(cmbSQLServer.Text))
+                        LoadDataBaseObjects();
+                }
 
-                txSQL.Text = _taskHost.Properties[Keys.SQL_STATEMENT].GetValue(_taskHost).ToString();
+                if (_taskHost.Properties[Keys.FIRSTROW].GetValue(_taskHost) != null)
+                    txFirstRow.Text = _taskHost.Properties[Keys.FIRSTROW].GetValue(_taskHost).ToString();
 
-                if (_taskHost.Properties[Keys.DESTINATION_FILE_CONNECTION].GetValue(_taskHost).ToString() == Keys.TRUE)
+                if (_taskHost.Properties[Keys.LASTROW].GetValue(_taskHost) != null)
+                    txLastRow.Text = _taskHost.Properties[Keys.LASTROW].GetValue(_taskHost).ToString();
+
+                if (_taskHost.Properties[Keys.FIELD_TERMINATOR].GetValue(_taskHost) != null)
+                    txFieldTerminator.Text = _taskHost.Properties[Keys.FIELD_TERMINATOR].GetValue(_taskHost).ToString();
+
+                if (_taskHost.Properties[Keys.ROW_TERMINATOR].GetValue(_taskHost) != null)
+                    txRowTerminator.Text = _taskHost.Properties[Keys.ROW_TERMINATOR].GetValue(_taskHost).ToString();
+
+                if (_taskHost.Properties[Keys.SQL_STATEMENT].GetValue(_taskHost) != null)
+                    txSQL.Text = _taskHost.Properties[Keys.SQL_STATEMENT].GetValue(_taskHost).ToString();
+
+                if (_taskHost.Properties[Keys.DESTINATION_FILE_CONNECTION].GetValue(_taskHost) != null)
+                {
+                    if (_taskHost.Properties[Keys.DESTINATION_FILE_CONNECTION].GetValue(_taskHost).ToString() == Keys.TRUE)
+                    {
+                        optFileConnection.Checked = true;
+                        LoadFileConnectionsDestination();
+                    }
+                    else
+                    {
+                        optFileVariable.Checked = true;
+                        LoadFileVariablesDestination();
+                    }
+                }
+                else
                 {
                     optFileConnection.Checked = true;
                     LoadFileConnectionsDestination();
                 }
+
+                if (_taskHost.Properties[Keys.FORMAT_FILE_CONNECTION].GetValue(_taskHost) != null)
+                {
+                    if (_taskHost.Properties[Keys.FORMAT_FILE_CONNECTION].GetValue(_taskHost).ToString() == Keys.TRUE)
+                    {
+                        optFileFormatConnection.Checked = true;
+                        LoadFileConnectionsFileFormat();
+                    }
+                    else
+                    {
+                        optFileFormatVariable.Checked = true;
+                        LoadFileVariablesFileFormat();
+                    }
+                }
                 else
                 {
-                    string selItem = string.Empty;
-                    optFileVariable.Checked = true;
-                    cmbDestination = LoadVariables("System.String", ref selItem);
+                    optFileFormatConnection.Checked = true;
+                    LoadFileConnectionsFileFormat();
                 }
 
-                if (_taskHost.Properties[Keys.TRUSTED_CONNECTION].GetValue(_taskHost).ToString() == Keys.TRUE)
+                string selectedItem = string.Empty;
+
+                cmbLogin.Items.Clear();
+                cmbPassword.Items.Clear();
+                cmbPassword = cmbLogin = LoadVariables("System.String", ref selectedItem);
+
+                if (_taskHost.Properties[Keys.TRUSTED_CONNECTION].GetValue(_taskHost) != null)
                 {
-                    cmbLogin.Items.Clear();
-                    cmbPassword.Items.Clear();
-                    chkTrustedConnection.Checked = true;
-                    cmbLogin.Enabled = false;
-                    cmbPassword.Enabled = false;
-                }
-                else
-                {
-                    string selItem = string.Empty;
-                    cmbPassword = cmbLogin = LoadVariables("System.String", ref selItem);
-                    chkTrustedConnection.Checked = false;
-                    cmbLogin.Enabled = true;
-                    cmbPassword.Enabled = true;
+                    bool isChecked;
+                    Boolean.TryParse(_taskHost.Properties[Keys.TRUSTED_CONNECTION].GetValue(_taskHost).ToString(), out isChecked);
+                    chkTrustedConnection.Checked = isChecked;
+                    label10.Enabled = label11.Enabled = cmbPassword.Enabled = cmbLogin.Enabled = !chkTrustedConnection.Checked;
                 }
 
-                LoadDataBaseObjects();
+                if (_taskHost.Properties[Keys.SQL_STATEMENT].GetValue(_taskHost) != null)
+                    txSQL.Text = _taskHost.Properties[Keys.SQL_STATEMENT].GetValue(_taskHost).ToString();
 
-                txSQL.Text = _taskHost.Properties[Keys.SQL_STATEMENT].GetValue(_taskHost).ToString();
+                if (_taskHost.Properties[Keys.SQL_VIEW].GetValue(_taskHost) != null)
+                    cmbViews.SelectedIndex = FindStringInComboBox(cmbViews, _taskHost.Properties[Keys.SQL_VIEW].GetValue(_taskHost).ToString(), -1);
 
-                cmbViews.SelectedIndex = FindStringInComboBox(cmbViews, _taskHost.Properties[Keys.SQL_VIEW].GetValue(_taskHost).ToString(), -1);
-                cmbStoredProcedures.SelectedIndex = FindStringInComboBox(cmbStoredProcedures, _taskHost.Properties[Keys.SQL_StoredProcedure].GetValue(_taskHost).ToString(), -1);
-                cmbTables.SelectedIndex = FindStringInComboBox(cmbTables, _taskHost.Properties[Keys.SQL_TABLE].GetValue(_taskHost).ToString(), -1);
+                if (_taskHost.Properties[Keys.SQL_StoredProcedure].GetValue(_taskHost) != null)
+                    cmbStoredProcedures.SelectedIndex = FindStringInComboBox(cmbStoredProcedures, _taskHost.Properties[Keys.SQL_StoredProcedure].GetValue(_taskHost).ToString(), -1);
 
-                cmbDestination.SelectedIndex = FindStringInComboBox(cmbDestination, _taskHost.Properties[Keys.DESTINATION].GetValue(_taskHost).ToString(), -1);
-                cmbFormatFile.SelectedIndex = FindStringInComboBox(cmbFormatFile, _taskHost.Properties[Keys.FORMAT_FILE].GetValue(_taskHost).ToString(), -1);
-                cmbLogin.SelectedIndex = FindStringInComboBox(cmbLogin, _taskHost.Properties[Keys.SRV_LOGIN].GetValue(_taskHost).ToString(), -1);
-                cmbPassword.SelectedIndex = FindStringInComboBox(cmbDestination, _taskHost.Properties[Keys.SRV_PASSWORD].GetValue(_taskHost).ToString(), -1);
+                if (_taskHost.Properties[Keys.SQL_TABLE].GetValue(_taskHost) != null)
+                    cmbTables.SelectedIndex = FindStringInComboBox(cmbTables, _taskHost.Properties[Keys.SQL_TABLE].GetValue(_taskHost).ToString(), -1);
 
-                chkRightsCMDSHELL.Checked = (_taskHost.Properties[Keys.ACTIVATE_CMDSHELL].GetValue(_taskHost).ToString() == Keys.TRUE) ? true : false;
+                if (_taskHost.Properties[Keys.DESTINATION].GetValue(_taskHost) != null)
+                    cmbDestination.SelectedIndex = FindStringInComboBox(cmbDestination, _taskHost.Properties[Keys.DESTINATION].GetValue(_taskHost).ToString(), -1);
 
+                if (_taskHost.Properties[Keys.FORMAT_FILE].GetValue(_taskHost) != null)
+                    cmbFormatFile.SelectedIndex = FindStringInComboBox(cmbFormatFile, _taskHost.Properties[Keys.FORMAT_FILE].GetValue(_taskHost).ToString(), -1);
+
+                if (_taskHost.Properties[Keys.SRV_LOGIN].GetValue(_taskHost) != null)
+                    cmbLogin.SelectedIndex = FindStringInComboBox(cmbLogin, _taskHost.Properties[Keys.SRV_LOGIN].GetValue(_taskHost).ToString(), -1);
+
+                if (_taskHost.Properties[Keys.SRV_PASSWORD].GetValue(_taskHost) != null)
+                    cmbPassword.SelectedIndex = FindStringInComboBox(cmbDestination, _taskHost.Properties[Keys.SRV_PASSWORD].GetValue(_taskHost).ToString(), -1);
+
+                if (_taskHost.Properties[Keys.CODE_PAGE].GetValue(_taskHost) != null)
+                    cmbCodePage.Text = _taskHost.Properties[Keys.CODE_PAGE].GetValue(_taskHost).ToString();
+
+                if (_taskHost.Properties[Keys.ACTIVATE_CMDSHELL].GetValue(_taskHost) != null)
+                    chkRightsCMDSHELL.Checked = (_taskHost.Properties[Keys.ACTIVATE_CMDSHELL].GetValue(_taskHost).ToString() == Keys.TRUE) ? true : false;
+
+                if (_taskHost.Properties[Keys.DATA_SOURCE].GetValue(_taskHost) != null)
+                    tabControl.SelectedTab = tabControl.TabPages.Cast<TabPage>().Where(tab => tab.Text == _taskHost.Properties[Keys.DATA_SOURCE].GetValue(_taskHost).ToString()).FirstOrDefault();
+
+                optFileVariable.CheckedChanged += (optFileVariable_CheckedChanged_1);
+                optFileVariable.Click += (optFileVariable_Click);
+                optFileConnection.CheckedChanged += (optFileConnection_CheckedChanged_1);
+                cmdFileVariable.Click += (cmdFileVariable_Click);
+                optFileFormatVariable.CheckedChanged += (optFileFormatVariable_CheckedChanged_1);
+                optFileFormatVariable.Click += (optFileFormatVariable_CheckedChanged);
+                optFileFormatConnection.CheckedChanged += (optFileFormatConnection_CheckedChanged_1);
+                optFileFormatConnection.ChangeUICues += (optFileFormatConnection_CheckedChanged);
 
                 _isFirstLoad = false;
             }
@@ -186,7 +258,7 @@ namespace SSISBulkExportTask100
         {
             cmbDestination.Items.Clear();
 
-            foreach (var connection in Connections)
+            foreach (var connection in Connections.Cast<ConnectionManager>().Where(connection => connection.CreationName == "FILE"))
             {
                 cmbDestination.Items.Add(connection.Name);
             }
@@ -196,7 +268,7 @@ namespace SSISBulkExportTask100
         {
             cmbFormatFile.Items.Clear();
 
-            foreach (var connection in Connections)
+            foreach (var connection in Connections.Cast<ConnectionManager>().Where(connection => connection.CreationName == "FILE"))
             {
                 cmbFormatFile.Items.Add(connection.Name);
             }
@@ -328,11 +400,13 @@ namespace SSISBulkExportTask100
                 }
 
                 sqlConnection.Close();
+            }
 
-                if (_isFirstLoad)
-                {
-                    var mappingParams = (MappingParams)_taskHost.Properties[Keys.SQL_STORED_PROCEDURE_PARAMS].GetValue(_taskHost);
+            if (_isFirstLoad)
+            {
+                var mappingParams = (MappingParams)_taskHost.Properties[Keys.SQL_STORED_PROCEDURE_PARAMS].GetValue(_taskHost);
 
+                if (mappingParams != null)
                     foreach (MappingParam mappingParam in mappingParams)
                     {
                         foreach (DataGridViewRow row in grdParameters.Rows.Cast<DataGridViewRow>().Where(row => row.Cells[0].Value.ToString() == mappingParam.Name))
@@ -340,8 +414,8 @@ namespace SSISBulkExportTask100
                             row.Cells[2].Value = mappingParam.Value;
                         }
                     }
-                }
             }
+
 
             Cursor = Cursors.Arrow;
         }
@@ -359,17 +433,17 @@ namespace SSISBulkExportTask100
         {
             _taskHost.Properties[Keys.SQL_SERVER].SetValue(_taskHost, cmbSQLServer.Text);
 
-            _taskHost.Properties[Keys.FORMAT_FILE_CONNECTION].SetValue(_taskHost, optFileFormatConnection.Checked ? "true" : "false");
+            _taskHost.Properties[Keys.FORMAT_FILE_CONNECTION].SetValue(_taskHost, optFileFormatConnection.Checked ? Keys.TRUE : Keys.FALSE);
             _taskHost.Properties[Keys.FORMAT_FILE].SetValue(_taskHost, cmbFormatFile.Text);
 
-            _taskHost.Properties[Keys.DESTINATION_FILE_CONNECTION].SetValue(_taskHost, optFileConnection.Checked ? "true" : "false");
+            _taskHost.Properties[Keys.DESTINATION_FILE_CONNECTION].SetValue(_taskHost, optFileConnection.Checked ? Keys.TRUE : Keys.FALSE);
             _taskHost.Properties[Keys.DESTINATION].SetValue(_taskHost, cmbDestination.Text);
 
-            _taskHost.Properties[Keys.TRUSTED_CONNECTION].SetValue(_taskHost, chkTrustedConnection.Checked ? "true" : "false");
+            _taskHost.Properties[Keys.TRUSTED_CONNECTION].SetValue(_taskHost, chkTrustedConnection.Checked ? Keys.TRUE : Keys.FALSE);
             _taskHost.Properties[Keys.SRV_LOGIN].SetValue(_taskHost, !chkTrustedConnection.Checked ? cmbLogin.Text : string.Empty);
             _taskHost.Properties[Keys.SRV_PASSWORD].SetValue(_taskHost, !chkTrustedConnection.Checked ? cmbPassword.Text : string.Empty);
 
-            _taskHost.Properties[Keys.NATIVE_DB_DATATYPE].SetValue(_taskHost, chkNativeDatabase.Checked ? "true" : "false");
+            _taskHost.Properties[Keys.NATIVE_DB_DATATYPE].SetValue(_taskHost, chkNativeDatabase.Checked ? Keys.TRUE : Keys.FALSE);
 
             _taskHost.Properties[Keys.FIRSTROW].SetValue(_taskHost, txFirstRow.Text.Trim());
             _taskHost.Properties[Keys.LASTROW].SetValue(_taskHost, txLastRow.Text.Trim());
@@ -377,7 +451,7 @@ namespace SSISBulkExportTask100
             _taskHost.Properties[Keys.FIELD_TERMINATOR].SetValue(_taskHost, txFieldTerminator.Text.Trim());
             _taskHost.Properties[Keys.ROW_TERMINATOR].SetValue(_taskHost, txRowTerminator.Text.Trim());
 
-            _taskHost.Properties[Keys.ACTIVATE_CMDSHELL].SetValue(_taskHost, chkRightsCMDSHELL.Checked ? "true" : "false");
+            _taskHost.Properties[Keys.ACTIVATE_CMDSHELL].SetValue(_taskHost, chkRightsCMDSHELL.Checked ? Keys.TRUE : Keys.FALSE);
 
             _taskHost.Properties[Keys.SQL_STATEMENT].SetValue(_taskHost, txSQL.Text.Trim());
             _taskHost.Properties[Keys.SQL_VIEW].SetValue(_taskHost, cmbViews.Text);
@@ -399,7 +473,9 @@ namespace SSISBulkExportTask100
 
             _taskHost.Properties[Keys.SQL_STORED_PROCEDURE_PARAMS].SetValue(_taskHost, mappingParams);
 
-            string val = (from d in _connections[cmbSQLServer.Text].ConnectionString.Split(';') where d == "Initial Catalog" select d).FirstOrDefault().ToString();
+            string val = (from db in _connections[cmbSQLServer.Text].ConnectionString.Split(';')
+                          where db.Contains("Initial Catalog")
+                          select db).FirstOrDefault();
 
             _taskHost.Properties[Keys.SQL_DATABASE].SetValue(_taskHost, string.Format("[{0}]", val.Split('=')[1]));
 
@@ -426,7 +502,7 @@ namespace SSISBulkExportTask100
 
         private void chkTrustedConnection_Click(object sender, EventArgs e)
         {
-            cmbLogin.Enabled = cmbPassword.Enabled = (chkTrustedConnection.Checked) ? false : true;
+            label10.Enabled = label11.Enabled = cmbLogin.Enabled = cmbPassword.Enabled = (chkTrustedConnection.Checked) ? false : true;
         }
 
         private void optFileConnection_Click(object sender, EventArgs e)
@@ -469,17 +545,6 @@ namespace SSISBulkExportTask100
             LoadStoredProcedureParameters(schema, storedProcedure);
         }
 
-        private void optFileConnection_CheckedChanged(object sender, EventArgs e)
-        {
-            LoadFileConnectionsDestination();
-        }
-
-        private void optFileVariable_CheckedChanged(object sender, EventArgs e)
-        {
-            string selItem = string.Empty;
-            cmbDestination = LoadVariables("System.String", ref selItem);
-        }
-
         private void optFileFormatConnection_CheckedChanged(object sender, EventArgs e)
         {
             LoadFileConnectionsFileFormat();
@@ -515,6 +580,33 @@ namespace SSISBulkExportTask100
 
         #endregion
 
+        private void optFileConnection_CheckedChanged_1(object sender, EventArgs e)
+        {
+            cmdFileVariable.Enabled = false;
+            LoadFileConnectionsDestination();
+        }
 
+        private void optFileVariable_CheckedChanged_1(object sender, EventArgs e)
+        {
+            cmdFileVariable.Enabled = true;
+            LoadFileVariablesDestination();
+        }
+
+        private void optFileFormatVariable_CheckedChanged_1(object sender, EventArgs e)
+        {
+            cmdFileFormatVariable.Enabled = true;
+            LoadFileVariablesFileFormat();
+        }
+
+        private void optFileFormatConnection_CheckedChanged_1(object sender, EventArgs e)
+        {
+            cmdFileFormatVariable.Enabled = false;
+            LoadFileConnectionsFileFormat();
+        }
+
+        private void chkTrustedConnection_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.SqlClient;
 using System.Linq;
@@ -11,11 +12,14 @@ using VariableDispenser = Microsoft.SqlServer.Dts.Runtime.VariableDispenser;
 
 namespace SSISBulkExportTask100.SSIS
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [DtsTask(
         DisplayName = "Bulk Export Task",
         UITypeName = "SSISBulkExportTask100.SSISBulkExportTaskUIInterface" +
         ",SSISBulkExportTask100," +
-        "Version=1.1.0.6," +
+        "Version=1.1.0.27," +
         "Culture=Neutral," +
         "PublicKeyToken=7660ecf4382af446",
         IconResource = "SSISBulkExportTask100.DownloadIcon.ico",
@@ -212,11 +216,28 @@ namespace SSISBulkExportTask100.SSIS
                                0,
                                ref refire);
 
-                ExecuteNonSQL(commandBulkExport, variableDispenser, connections, 0);
+                List<string> result = ExecuteReader(commandBulkExport, variableDispenser, connections, 0);
+
+                componentEvents.FireInformation(0,
+                               "SSISBulkExportTask",
+                               "Execution response:",
+                               string.Empty,
+                               0,
+                               ref refire);
+
+                foreach (var item in result)
+                {
+                    componentEvents.FireInformation(0,
+                               "SSISBulkExportTask",
+                               item.Trim(),
+                               string.Empty,
+                               0,
+                               ref refire);
+                }
 
                 componentEvents.FireInformation(0,
                                                "SSISBulkExportTask",
-                                               string.Format("The Bulk export has been succesfully done!"),
+                                               "The Bulk export has been succesfully done!",
                                                string.Empty,
                                                0,
                                                ref refire);
@@ -268,6 +289,44 @@ namespace SSISBulkExportTask100.SSIS
                                                    })
                 {
                     retVal = sqlCommand.ExecuteNonQuery();
+                }
+
+                sqlConnection.Close();
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
+        /// Executes the reader.
+        /// </summary>
+        /// <param name="sql">The SQL.</param>
+        /// <param name="variableDispenser">The variable dispenser.</param>
+        /// <param name="connections">The connections.</param>
+        /// <param name="commandTimeOut">The command time out.</param>
+        /// <returns></returns>
+        public List<string> ExecuteReader(string sql, VariableDispenser variableDispenser, Connections connections, int commandTimeOut)
+        {
+            var retVal = new List<string>();
+
+            using (var sqlConnection = new SqlConnection(connections[SQLServerInstance].ConnectionString))
+            {
+                sqlConnection.Open();
+
+                using (var sqlCommand = new SqlCommand(sql, sqlConnection)
+                {
+                    CommandTimeout = commandTimeOut
+                })
+                {
+                    using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
+                    {
+                        if (sqlDataReader != null)
+                            while (sqlDataReader.Read())
+                            {
+                                if (!sqlDataReader.IsDBNull(0))
+                                    retVal.Add(sqlDataReader.GetString(0));
+                            }
+                    }
                 }
 
                 sqlConnection.Close();
@@ -521,7 +580,7 @@ namespace SSISBulkExportTask100.SSIS
             XmlAttribute dataSource = doc.CreateAttribute(string.Empty, Keys.DATA_SOURCE, string.Empty);
             dataSource.Value = DataSource;
 
-            XmlAttribute dataBase = doc.CreateAttribute(string.Empty, Keys.DATA_SOURCE, string.Empty);
+            XmlAttribute dataBase = doc.CreateAttribute(string.Empty, Keys.SQL_DATABASE, string.Empty);
             dataBase.Value = Database;
 
             XmlAttribute sqlStatment = doc.CreateAttribute(string.Empty, Keys.SQL_STATEMENT, string.Empty);
