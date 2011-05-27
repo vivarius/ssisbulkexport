@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmEditProperties));
             this.btSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.cmbSQLServer = new System.Windows.Forms.ComboBox();
@@ -54,6 +55,14 @@
             this.label7 = new System.Windows.Forms.Label();
             this.btPreview = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.chkChDataType = new System.Windows.Forms.CheckBox();
+            this.chkUnicode = new System.Windows.Forms.CheckBox();
+            this.chkQuotes = new System.Windows.Forms.CheckBox();
+            this.txMaxErrors = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.chkRegionalSettings = new System.Windows.Forms.CheckBox();
+            this.txPacketSize = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
             this.cmbCodePage = new System.Windows.Forms.ComboBox();
             this.label13 = new System.Windows.Forms.Label();
             this.chkRightsCMDSHELL = new System.Windows.Forms.CheckBox();
@@ -100,9 +109,9 @@
             // btSave
             // 
             this.btSave.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btSave.Location = new System.Drawing.Point(404, 568);
+            this.btSave.Location = new System.Drawing.Point(404, 552);
             this.btSave.Name = "btSave";
-            this.btSave.Size = new System.Drawing.Size(75, 33);
+            this.btSave.Size = new System.Drawing.Size(75, 25);
             this.btSave.TabIndex = 32;
             this.btSave.Text = "OK";
             this.btSave.UseVisualStyleBackColor = true;
@@ -111,15 +120,16 @@
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(485, 568);
+            this.btnCancel.Location = new System.Drawing.Point(485, 552);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 33);
+            this.btnCancel.Size = new System.Drawing.Size(75, 25);
             this.btnCancel.TabIndex = 31;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
             // cmbSQLServer
             // 
+            this.cmbSQLServer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbSQLServer.FormattingEnabled = true;
             this.cmbSQLServer.Location = new System.Drawing.Point(93, 6);
             this.cmbSQLServer.Name = "cmbSQLServer";
@@ -192,6 +202,7 @@
             // 
             // cmbViews
             // 
+            this.cmbViews.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbViews.FormattingEnabled = true;
             this.cmbViews.Location = new System.Drawing.Point(50, 14);
             this.cmbViews.Name = "cmbViews";
@@ -222,6 +233,7 @@
             // 
             // cmbStoredProcedures
             // 
+            this.cmbStoredProcedures.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbStoredProcedures.FormattingEnabled = true;
             this.cmbStoredProcedures.Location = new System.Drawing.Point(111, 9);
             this.cmbStoredProcedures.Name = "cmbStoredProcedures";
@@ -311,6 +323,7 @@
             // 
             // cmbTables
             // 
+            this.cmbTables.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbTables.FormattingEnabled = true;
             this.cmbTables.Location = new System.Drawing.Point(47, 15);
             this.cmbTables.Name = "cmbTables";
@@ -337,6 +350,14 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.chkChDataType);
+            this.groupBox1.Controls.Add(this.chkUnicode);
+            this.groupBox1.Controls.Add(this.chkQuotes);
+            this.groupBox1.Controls.Add(this.txMaxErrors);
+            this.groupBox1.Controls.Add(this.label15);
+            this.groupBox1.Controls.Add(this.chkRegionalSettings);
+            this.groupBox1.Controls.Add(this.txPacketSize);
+            this.groupBox1.Controls.Add(this.label14);
             this.groupBox1.Controls.Add(this.cmbCodePage);
             this.groupBox1.Controls.Add(this.label13);
             this.groupBox1.Controls.Add(this.chkRightsCMDSHELL);
@@ -352,10 +373,89 @@
             this.groupBox1.Controls.Add(this.txFirstRow);
             this.groupBox1.Location = new System.Drawing.Point(15, 240);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(545, 179);
+            this.groupBox1.Size = new System.Drawing.Size(545, 236);
             this.groupBox1.TabIndex = 42;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Parameters";
+            // 
+            // chkChDataType
+            // 
+            this.chkChDataType.AutoSize = true;
+            this.chkChDataType.Location = new System.Drawing.Point(371, 98);
+            this.chkChDataType.Name = "chkChDataType";
+            this.chkChDataType.Size = new System.Drawing.Size(149, 17);
+            this.chkChDataType.TabIndex = 20;
+            this.chkChDataType.Text = "Use a character data type";
+            this.chkChDataType.UseVisualStyleBackColor = true;
+            // 
+            // chkUnicode
+            // 
+            this.chkUnicode.AutoSize = true;
+            this.chkUnicode.Location = new System.Drawing.Point(220, 98);
+            this.chkUnicode.Name = "chkUnicode";
+            this.chkUnicode.Size = new System.Drawing.Size(141, 17);
+            this.chkUnicode.TabIndex = 19;
+            this.chkUnicode.Text = "Use Unicode characters";
+            this.toolTip1.SetToolTip(this.chkUnicode, resources.GetString("chkUnicode.ToolTip"));
+            this.chkUnicode.UseVisualStyleBackColor = true;
+            // 
+            // chkQuotes
+            // 
+            this.chkQuotes.AutoSize = true;
+            this.chkQuotes.Location = new System.Drawing.Point(15, 98);
+            this.chkQuotes.Name = "chkQuotes";
+            this.chkQuotes.Size = new System.Drawing.Size(188, 17);
+            this.chkQuotes.TabIndex = 18;
+            this.chkQuotes.Text = "SET QUOTED_IDENTIFIERS ON";
+            this.toolTip1.SetToolTip(this.chkQuotes, resources.GetString("chkQuotes.ToolTip"));
+            this.chkQuotes.UseVisualStyleBackColor = true;
+            // 
+            // txMaxErrors
+            // 
+            this.txMaxErrors.Location = new System.Drawing.Point(74, 72);
+            this.txMaxErrors.Name = "txMaxErrors";
+            this.txMaxErrors.Size = new System.Drawing.Size(76, 20);
+            this.txMaxErrors.TabIndex = 17;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(12, 75);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(63, 13);
+            this.label15.TabIndex = 16;
+            this.label15.Text = "Max. Errors:";
+            this.toolTip1.SetToolTip(this.label15, resources.GetString("label15.ToolTip"));
+            // 
+            // chkRegionalSettings
+            // 
+            this.chkRegionalSettings.AutoSize = true;
+            this.chkRegionalSettings.Location = new System.Drawing.Point(371, 127);
+            this.chkRegionalSettings.Name = "chkRegionalSettings";
+            this.chkRegionalSettings.Size = new System.Drawing.Size(168, 17);
+            this.chkRegionalSettings.TabIndex = 15;
+            this.chkRegionalSettings.Text = "Use the regional locale setting";
+            this.toolTip1.SetToolTip(this.chkRegionalSettings, "Specifies that currency, date, and time data is bulk copied into SQL Server using" +
+                    " the regional format defined for the locale setting of the client computer. By d" +
+                    "efault, regional settings are ignored.");
+            this.chkRegionalSettings.UseVisualStyleBackColor = true;
+            // 
+            // txPacketSize
+            // 
+            this.txPacketSize.Location = new System.Drawing.Point(438, 48);
+            this.txPacketSize.Name = "txPacketSize";
+            this.txPacketSize.Size = new System.Drawing.Size(97, 20);
+            this.txPacketSize.TabIndex = 14;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(331, 50);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(107, 13);
+            this.label14.TabIndex = 13;
+            this.label14.Text = "Network packet size:";
+            this.toolTip1.SetToolTip(this.label14, resources.GetString("label14.ToolTip"));
             // 
             // cmbCodePage
             // 
@@ -365,9 +465,9 @@
             "ACP",
             "OEM",
             "RAW"});
-            this.cmbCodePage.Location = new System.Drawing.Point(397, 20);
+            this.cmbCodePage.Location = new System.Drawing.Point(438, 20);
             this.cmbCodePage.Name = "cmbCodePage";
-            this.cmbCodePage.Size = new System.Drawing.Size(138, 21);
+            this.cmbCodePage.Size = new System.Drawing.Size(97, 21);
             this.cmbCodePage.TabIndex = 12;
             // 
             // label13
@@ -375,14 +475,14 @@
             this.label13.AutoSize = true;
             this.label13.Location = new System.Drawing.Point(332, 25);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(59, 13);
+            this.label13.Size = new System.Drawing.Size(62, 13);
             this.label13.TabIndex = 11;
-            this.label13.Text = "Code page";
+            this.label13.Text = "Code page:";
             // 
             // chkRightsCMDSHELL
             // 
             this.chkRightsCMDSHELL.AutoSize = true;
-            this.chkRightsCMDSHELL.Location = new System.Drawing.Point(397, 73);
+            this.chkRightsCMDSHELL.Location = new System.Drawing.Point(220, 127);
             this.chkRightsCMDSHELL.Name = "chkRightsCMDSHELL";
             this.chkRightsCMDSHELL.Size = new System.Drawing.Size(136, 17);
             this.chkRightsCMDSHELL.TabIndex = 10;
@@ -396,7 +496,7 @@
             this.groupBox2.Controls.Add(this.cmbLogin);
             this.groupBox2.Controls.Add(this.label10);
             this.groupBox2.Controls.Add(this.chkTrustedConnection);
-            this.groupBox2.Location = new System.Drawing.Point(4, 97);
+            this.groupBox2.Location = new System.Drawing.Point(6, 150);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(535, 78);
             this.groupBox2.TabIndex = 9;
@@ -405,6 +505,7 @@
             // 
             // cmbPassword
             // 
+            this.cmbPassword.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbPassword.Enabled = false;
             this.cmbPassword.FormattingEnabled = true;
             this.cmbPassword.Location = new System.Drawing.Point(330, 46);
@@ -424,6 +525,7 @@
             // 
             // cmbLogin
             // 
+            this.cmbLogin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbLogin.Enabled = false;
             this.cmbLogin.FormattingEnabled = true;
             this.cmbLogin.Location = new System.Drawing.Point(47, 46);
@@ -492,9 +594,9 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(160, 25);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(78, 13);
+            this.label4.Size = new System.Drawing.Size(81, 13);
             this.label4.TabIndex = 5;
-            this.label4.Text = "Field terminator";
+            this.label4.Text = "Field terminator:";
             this.toolTip1.SetToolTip(this.label4, "Specifies the field terminator. The default is \\t (tab character). Use this param" +
                     "eter to override the default field terminator. \r\n");
             // 
@@ -503,11 +605,11 @@
             this.chkNativeDatabase.AutoSize = true;
             this.chkNativeDatabase.Checked = true;
             this.chkNativeDatabase.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkNativeDatabase.Location = new System.Drawing.Point(15, 73);
+            this.chkNativeDatabase.Location = new System.Drawing.Point(15, 127);
             this.chkNativeDatabase.Name = "chkNativeDatabase";
-            this.chkNativeDatabase.Size = new System.Drawing.Size(254, 17);
+            this.chkNativeDatabase.Size = new System.Drawing.Size(183, 17);
             this.chkNativeDatabase.TabIndex = 4;
-            this.chkNativeDatabase.Text = "Use the native (database) data types of the data";
+            this.chkNativeDatabase.Text = "Use native data types of the data";
             this.toolTip1.SetToolTip(this.chkNativeDatabase, "Performs the bulk-copy operation using the native (database) data types of the da" +
                     "ta. This option does not prompt for each field; it uses the native values.\r\n");
             this.chkNativeDatabase.UseVisualStyleBackColor = true;
@@ -551,16 +653,16 @@
             this.groupBox3.Controls.Add(this.cmdFileVariable);
             this.groupBox3.Controls.Add(this.label8);
             this.groupBox3.Controls.Add(this.cmbDestination);
-            this.groupBox3.Location = new System.Drawing.Point(15, 421);
+            this.groupBox3.Location = new System.Drawing.Point(15, 482);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(545, 64);
+            this.groupBox3.Size = new System.Drawing.Size(270, 64);
             this.groupBox3.TabIndex = 48;
             this.groupBox3.TabStop = false;
             // 
             // optFileVariable
             // 
             this.optFileVariable.AutoSize = true;
-            this.optFileVariable.Location = new System.Drawing.Point(194, 39);
+            this.optFileVariable.Location = new System.Drawing.Point(136, 39);
             this.optFileVariable.Name = "optFileVariable";
             this.optFileVariable.Size = new System.Drawing.Size(128, 17);
             this.optFileVariable.TabIndex = 45;
@@ -573,7 +675,7 @@
             // 
             this.optFileConnection.AutoSize = true;
             this.optFileConnection.Checked = true;
-            this.optFileConnection.Location = new System.Drawing.Point(76, 39);
+            this.optFileConnection.Location = new System.Drawing.Point(15, 39);
             this.optFileConnection.Name = "optFileConnection";
             this.optFileConnection.Size = new System.Drawing.Size(98, 17);
             this.optFileConnection.TabIndex = 44;
@@ -585,7 +687,7 @@
             // 
             // cmdFileVariable
             // 
-            this.cmdFileVariable.Location = new System.Drawing.Point(505, 10);
+            this.cmdFileVariable.Location = new System.Drawing.Point(231, 10);
             this.cmdFileVariable.Name = "cmdFileVariable";
             this.cmdFileVariable.Size = new System.Drawing.Size(36, 23);
             this.cmdFileVariable.TabIndex = 43;
@@ -596,7 +698,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(12, 15);
+            this.label8.Location = new System.Drawing.Point(7, 15);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(60, 13);
             this.label8.TabIndex = 42;
@@ -605,9 +707,9 @@
             // cmbDestination
             // 
             this.cmbDestination.FormattingEnabled = true;
-            this.cmbDestination.Location = new System.Drawing.Point(78, 12);
+            this.cmbDestination.Location = new System.Drawing.Point(73, 11);
             this.cmbDestination.Name = "cmbDestination";
-            this.cmbDestination.Size = new System.Drawing.Size(420, 21);
+            this.cmbDestination.Size = new System.Drawing.Size(152, 21);
             this.cmbDestination.TabIndex = 41;
             // 
             // groupBox4
@@ -617,16 +719,16 @@
             this.groupBox4.Controls.Add(this.cmdFileFormatVariable);
             this.groupBox4.Controls.Add(this.label12);
             this.groupBox4.Controls.Add(this.cmbFormatFile);
-            this.groupBox4.Location = new System.Drawing.Point(15, 491);
+            this.groupBox4.Location = new System.Drawing.Point(291, 482);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(545, 71);
+            this.groupBox4.Size = new System.Drawing.Size(271, 64);
             this.groupBox4.TabIndex = 49;
             this.groupBox4.TabStop = false;
             // 
             // optFileFormatVariable
             // 
             this.optFileFormatVariable.AutoSize = true;
-            this.optFileFormatVariable.Location = new System.Drawing.Point(198, 46);
+            this.optFileFormatVariable.Location = new System.Drawing.Point(131, 39);
             this.optFileFormatVariable.Name = "optFileFormatVariable";
             this.optFileFormatVariable.Size = new System.Drawing.Size(128, 17);
             this.optFileFormatVariable.TabIndex = 52;
@@ -639,7 +741,7 @@
             // 
             this.optFileFormatConnection.AutoSize = true;
             this.optFileFormatConnection.Checked = true;
-            this.optFileFormatConnection.Location = new System.Drawing.Point(80, 46);
+            this.optFileFormatConnection.Location = new System.Drawing.Point(9, 39);
             this.optFileFormatConnection.Name = "optFileFormatConnection";
             this.optFileFormatConnection.Size = new System.Drawing.Size(98, 17);
             this.optFileFormatConnection.TabIndex = 51;
@@ -651,7 +753,7 @@
             // 
             // cmdFileFormatVariable
             // 
-            this.cmdFileFormatVariable.Location = new System.Drawing.Point(505, 17);
+            this.cmdFileFormatVariable.Location = new System.Drawing.Point(223, 10);
             this.cmdFileFormatVariable.Name = "cmdFileFormatVariable";
             this.cmdFileFormatVariable.Size = new System.Drawing.Size(36, 23);
             this.cmdFileFormatVariable.TabIndex = 50;
@@ -662,7 +764,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(16, 22);
+            this.label12.Location = new System.Drawing.Point(6, 15);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(55, 13);
             this.label12.TabIndex = 49;
@@ -671,16 +773,16 @@
             // cmbFormatFile
             // 
             this.cmbFormatFile.FormattingEnabled = true;
-            this.cmbFormatFile.Location = new System.Drawing.Point(82, 19);
+            this.cmbFormatFile.Location = new System.Drawing.Point(69, 11);
             this.cmbFormatFile.Name = "cmbFormatFile";
-            this.cmbFormatFile.Size = new System.Drawing.Size(420, 21);
+            this.cmbFormatFile.Size = new System.Drawing.Size(152, 21);
             this.cmbFormatFile.TabIndex = 48;
             // 
             // frmEditProperties
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(572, 609);
+            this.ClientSize = new System.Drawing.Size(572, 585);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox1);
@@ -691,6 +793,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btGO);
             this.Controls.Add(this.cmbSQLServer);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "frmEditProperties";
@@ -777,6 +880,14 @@
         private System.Windows.Forms.Button cmdFileFormatVariable;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.ComboBox cmbFormatFile;
+        private System.Windows.Forms.TextBox txPacketSize;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.CheckBox chkRegionalSettings;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.TextBox txMaxErrors;
+        private System.Windows.Forms.CheckBox chkQuotes;
+        private System.Windows.Forms.CheckBox chkUnicode;
+        private System.Windows.Forms.CheckBox chkChDataType;
 
     }
 }

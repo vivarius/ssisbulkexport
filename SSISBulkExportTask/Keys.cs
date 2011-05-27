@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -31,8 +33,13 @@ namespace SSISBulkExportTask100
         public const string FORMAT_FILE = "FormatFile";
         public const string FORMAT_FILE_CONNECTION = "FormatFileByFileConnection";
         public const string ACTIVATE_CMDSHELL = "ActivateCmdShell";
-
+        public const string NETWORK_PACKET_SIZE = "NetworkPacketSize";
         public const string CODE_PAGE = "CodePage";
+        public const string USE_REGIONAL_SETTINGS = "UseRegionalSettings";
+
+        public const string SET_QUOTED_IDENTIFIERS_ON = "SET_QUOTED_IDENTIFIERS_ON";
+        public const string UNICODE_CHR = "UseUnicodeCharacters";
+        public const string CHARACTER_DATA_TYPE = "UseCharacterDataType";
 
         public const string TRUE = "true";
         public const string FALSE = "false";
@@ -100,6 +107,11 @@ namespace SSISBulkExportTask100
         public string FormatFileByFileConnection { get; set; }
         public string ActivateCmdShell { get; set; }
         public string CodePage { get; set; }
+        public string NetworkPacketSize { get; set; }
+        public string UseRegionalSettings { get; set; }
+        public string SET_QUOTED_IDENTIFIERS_ON { get; set; }
+        public string UseUnicodeCharacters { get; set; }
+        public string UseCharacterDataType { get; set; }
         #endregion
 
         #region .ctor
@@ -226,10 +238,10 @@ namespace SSISBulkExportTask100
                          ? string.Format(@" -f""{0}"" ", _connection[FormatFile].ConnectionString)
                          : string.Format(@" -f""{0}"" ", EvaluateExpression(FormatFile, _variableDispenser)));
             }
-            else
-            {
-                _stringBuilder.Append(" -c ");
-            }
+            //else
+            //{
+            //    _stringBuilder.Append(" -c ");
+            //}
 
             if (!string.IsNullOrEmpty(FieldTermiantor.Trim()))
             {
@@ -246,11 +258,88 @@ namespace SSISBulkExportTask100
                 _stringBuilder.Append(string.Format(" -C{0} ", CodePage));
             }
 
+            if (!string.IsNullOrEmpty(NetworkPacketSize.Trim()))
+            {
+                _stringBuilder.Append(string.Format(" -a{0} ", NetworkPacketSize));
+            }
+
+            if (UseRegionalSettings == Keys.TRUE)
+            {
+                _stringBuilder.Append(" -R ");
+            }
+
+            if (SET_QUOTED_IDENTIFIERS_ON == Keys.TRUE)
+            {
+                _stringBuilder.Append(" -q ");
+            }
+
+            if (UseCharacterDataType == Keys.TRUE)
+            {
+                _stringBuilder.Append(" -c ");
+            }
+
+            if (UseUnicodeCharacters == Keys.TRUE)
+            {
+                _stringBuilder.Append(" -w ");
+            }
+
             _stringBuilder.Append("'");
 
             return _stringBuilder.ToString();
         }
 
         #endregion
+    }
+
+    public class SQLGoodies
+    {
+        private static Hashtable _sqlDTypeTable;
+
+        public static Type ConvertFromSqlDbType(SqlDbType type)
+        {
+            if (_sqlDTypeTable == null)
+            {
+                _sqlDTypeTable = new Hashtable
+                                  {
+                                      {SqlDbType.Bit,  typeof (Boolean)},
+                                      {SqlDbType.SmallInt, typeof (Int16)},
+                                      {SqlDbType.Int, typeof (Int32)},
+                                      {SqlDbType.BigInt, typeof (Int64)},
+                                      {SqlDbType.Float, typeof (Double)},
+                                      {SqlDbType.Decimal, typeof (Decimal)},
+                                      {SqlDbType.Money, typeof (Decimal)},
+                                      {SqlDbType.VarChar, typeof (String)},
+                                      {SqlDbType.DateTime, typeof (DateTime)},
+                                      {SqlDbType.VarBinary, typeof (Byte[])},
+                                      {SqlDbType.Binary, typeof (Byte[])},
+                                      {SqlDbType.Image, typeof (Byte[])},
+                                      {SqlDbType.UniqueIdentifier, typeof (Guid)},
+                                      {SqlDbType.Char, typeof (string)},
+                                      {SqlDbType.NChar, typeof (string)},
+                                      {SqlDbType.NText, typeof (string)},
+                                      {SqlDbType.NVarChar, typeof (string)},
+                                      {SqlDbType.Real, typeof (Single)},
+                                      {SqlDbType.SmallDateTime, typeof (DateTime)},
+                                      {SqlDbType.SmallMoney, typeof (decimal)},
+                                      {SqlDbType.Text, typeof (string)},
+                                      {SqlDbType.Timestamp, typeof (Byte[])},
+                                      {SqlDbType.TinyInt, typeof (Byte)},
+                                      {SqlDbType.Variant, typeof (object)}
+                                  };
+            }
+
+            Type dbtype;
+
+            try
+            {
+                dbtype = (Type)_sqlDTypeTable[type];
+            }
+            catch
+            {
+                dbtype = typeof(string);
+            }
+
+            return dbtype;
+        }
     }
 }

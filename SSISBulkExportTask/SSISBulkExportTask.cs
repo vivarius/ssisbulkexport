@@ -19,7 +19,7 @@ namespace SSISBulkExportTask100.SSIS
         DisplayName = "Bulk Export Task",
         UITypeName = "SSISBulkExportTask100.SSISBulkExportTaskUIInterface" +
         ",SSISBulkExportTask100," +
-        "Version=1.1.0.27," +
+        "Version=1.1.0.34," +
         "Culture=Neutral," +
         "PublicKeyToken=7660ecf4382af446",
         IconResource = "SSISBulkExportTask100.DownloadIcon.ico",
@@ -80,7 +80,16 @@ namespace SSISBulkExportTask100.SSIS
         public string ActivateCmdShell { get; set; }
         [Category("Component specific"), Description("Specifies the code page of the data in the data file. code_page is relevant only if the data contains char, varchar, or text columns with character values greater than 127 or less than 32.")]
         public string CodePage { get; set; }
-
+        [Category("Component specific"), Description("Specifies the number of bytes, per network packet, sent to and from the server. A server configuration option can be set by using SQL Server Management Studio (or the sp_configure system stored procedure). However, the server configuration option can be overridden on an individual basis by using this option. packet_size can be from 4096 to 65535 bytes; the default is 4096.")]
+        public string NetworkPacketSize { get; set; }
+        [Category("Component specific"), Description("Specifies that currency, date, and time data is bulk copied into SQL Server using the regional format defined for the locale setting of the client computer. By default, regional settings are ignored.")]
+        public string UseRegionalSettings { get; set; }
+        [Category("Component specific"), Description(@"Executes the SET QUOTED_IDENTIFIERS ON statement in the connection between the bcp utility and an instance of SQL Server. Use this option to specify a database, owner, table, or view name that contains a space or a single quotation mark. Enclose the entire three-part table or view name in quotation marks ("").")]
+        public string SET_QUOTED_IDENTIFIERS_ON { get; set; }
+        [Category("Component specific"), Description("Performs the bulk copy operation using Unicode characters. This option does not prompt for each field; it uses nchar as the storage type, no prefixes, \t (tab character) as the field separator, and \n (newline character) as the row terminator.")]
+        public string UseUnicodeCharacters { get; set; }
+        [Category("Component specific"), Description("Performs the operation using a character data type. This option does not prompt for each field; it uses char as the storage type, without prefixes and with \t (tab character) as the field separator and \r\n (newline character) as the row terminator.")]
+        public string UseCharacterDataType { get; set; }
         #endregion
 
         #region Private Properties
@@ -204,7 +213,12 @@ namespace SSISBulkExportTask100.SSIS
                                   FormatFile = FormatFile,
                                   FormatFileByFileConnection = FormatFileByFileConnection,
                                   ActivateCmdShell = ActivateCmdShell,
-                                  CodePage = CodePage
+                                  CodePage = CodePage,
+                                  NetworkPacketSize = NetworkPacketSize,
+                                  UseRegionalSettings = UseRegionalSettings,
+                                  SET_QUOTED_IDENTIFIERS_ON = SET_QUOTED_IDENTIFIERS_ON,
+                                  UseUnicodeCharacters = UseUnicodeCharacters,
+                                  UseCharacterDataType = UseCharacterDataType
                               };
 
                 string commandBulkExport = bcp.ToString();
@@ -640,6 +654,21 @@ namespace SSISBulkExportTask100.SSIS
             XmlAttribute codePage = doc.CreateAttribute(string.Empty, Keys.CODE_PAGE, string.Empty);
             codePage.Value = CodePage;
 
+            XmlAttribute networkPacketSize = doc.CreateAttribute(string.Empty, Keys.NETWORK_PACKET_SIZE, string.Empty);
+            networkPacketSize.Value = NetworkPacketSize;
+
+            XmlAttribute useRegionalSettings = doc.CreateAttribute(string.Empty, Keys.USE_REGIONAL_SETTINGS, string.Empty);
+            useRegionalSettings.Value = UseRegionalSettings;
+
+            XmlAttribute setQuotedIdentifiersOn = doc.CreateAttribute(string.Empty, Keys.SET_QUOTED_IDENTIFIERS_ON, string.Empty);
+            setQuotedIdentifiersOn.Value = SET_QUOTED_IDENTIFIERS_ON;
+
+            XmlAttribute useUnicodeChr = doc.CreateAttribute(string.Empty, Keys.UNICODE_CHR, string.Empty);
+            useUnicodeChr.Value = UseUnicodeCharacters;
+
+            XmlAttribute characterDataType = doc.CreateAttribute(string.Empty, Keys.CHARACTER_DATA_TYPE, string.Empty);
+            characterDataType.Value = UseCharacterDataType;
+
             taskElement.Attributes.Append(sqlServer);
             taskElement.Attributes.Append(dataSource);
             taskElement.Attributes.Append(dataBase);
@@ -662,6 +691,12 @@ namespace SSISBulkExportTask100.SSIS
             taskElement.Attributes.Append(formatFileConnection);
             taskElement.Attributes.Append(activateCmdShell);
             taskElement.Attributes.Append(codePage);
+            taskElement.Attributes.Append(networkPacketSize);
+            taskElement.Attributes.Append(useRegionalSettings);
+            taskElement.Attributes.Append(setQuotedIdentifiersOn);
+            taskElement.Attributes.Append(useUnicodeChr);
+            taskElement.Attributes.Append(characterDataType);
+
 
             doc.AppendChild(taskElement);
         }
@@ -702,6 +737,8 @@ namespace SSISBulkExportTask100.SSIS
                 FormatFileByFileConnection = node.Attributes.GetNamedItem(Keys.FORMAT_FILE_CONNECTION).Value;
                 ActivateCmdShell = node.Attributes.GetNamedItem(Keys.ACTIVATE_CMDSHELL).Value;
                 CodePage = node.Attributes.GetNamedItem(Keys.CODE_PAGE).Value;
+                NetworkPacketSize = node.Attributes.GetNamedItem(Keys.NETWORK_PACKET_SIZE).Value;
+                UseRegionalSettings = node.Attributes.GetNamedItem(Keys.USE_REGIONAL_SETTINGS).Value;
             }
             catch
             {

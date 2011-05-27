@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Windows.Forms;
@@ -77,6 +78,17 @@ namespace SSISBulkExportTask100
                         LoadDataBaseObjects();
                 }
 
+                if (_taskHost.Properties[Keys.NETWORK_PACKET_SIZE].GetValue(_taskHost) != null)
+                    txPacketSize.Text = _taskHost.Properties[Keys.NETWORK_PACKET_SIZE].GetValue(_taskHost).ToString();
+
+                if (_taskHost.Properties[Keys.USE_REGIONAL_SETTINGS].GetValue(_taskHost) != null)
+                {
+                    bool isCheckedRegionalSettings;
+                    Boolean.TryParse(_taskHost.Properties[Keys.USE_REGIONAL_SETTINGS].GetValue(_taskHost).ToString(),
+                                     out isCheckedRegionalSettings);
+                    chkRegionalSettings.Checked = isCheckedRegionalSettings;
+                }
+
                 if (_taskHost.Properties[Keys.FIRSTROW].GetValue(_taskHost) != null)
                     txFirstRow.Text = _taskHost.Properties[Keys.FIRSTROW].GetValue(_taskHost).ToString();
 
@@ -138,10 +150,31 @@ namespace SSISBulkExportTask100
 
                 if (_taskHost.Properties[Keys.TRUSTED_CONNECTION].GetValue(_taskHost) != null)
                 {
-                    bool isChecked;
-                    Boolean.TryParse(_taskHost.Properties[Keys.TRUSTED_CONNECTION].GetValue(_taskHost).ToString(), out isChecked);
-                    chkTrustedConnection.Checked = isChecked;
+                    bool isCheckedTrustedConnection;
+                    Boolean.TryParse(_taskHost.Properties[Keys.TRUSTED_CONNECTION].GetValue(_taskHost).ToString(), out isCheckedTrustedConnection);
+                    chkTrustedConnection.Checked = isCheckedTrustedConnection;
                     label10.Enabled = label11.Enabled = cmbPassword.Enabled = cmbLogin.Enabled = !chkTrustedConnection.Checked;
+                }
+
+                if (_taskHost.Properties[Keys.SET_QUOTED_IDENTIFIERS_ON].GetValue(_taskHost) != null)
+                {
+                    bool isSET_QUOTED_IDENTIFIERS_ON;
+                    Boolean.TryParse(_taskHost.Properties[Keys.SET_QUOTED_IDENTIFIERS_ON].GetValue(_taskHost).ToString(), out isSET_QUOTED_IDENTIFIERS_ON);
+                    chkQuotes.Checked = isSET_QUOTED_IDENTIFIERS_ON;
+                }
+
+                if (_taskHost.Properties[Keys.UNICODE_CHR].GetValue(_taskHost) != null)
+                {
+                    bool isUnicode;
+                    Boolean.TryParse(_taskHost.Properties[Keys.UNICODE_CHR].GetValue(_taskHost).ToString(), out isUnicode);
+                    chkUnicode.Checked = isUnicode;
+                }
+
+                if (_taskHost.Properties[Keys.CHARACTER_DATA_TYPE].GetValue(_taskHost) != null)
+                {
+                    bool isChrDataType;
+                    Boolean.TryParse(_taskHost.Properties[Keys.CHARACTER_DATA_TYPE].GetValue(_taskHost).ToString(), out isChrDataType);
+                    chkChDataType.Checked = isChrDataType;
                 }
 
                 if (_taskHost.Properties[Keys.SQL_STATEMENT].GetValue(_taskHost) != null)
@@ -459,8 +492,13 @@ namespace SSISBulkExportTask100
             _taskHost.Properties[Keys.SQL_TABLE].SetValue(_taskHost, cmbTables.Text);
 
             _taskHost.Properties[Keys.CODE_PAGE].SetValue(_taskHost, cmbCodePage.Text.Trim());
-
             _taskHost.Properties[Keys.DATA_SOURCE].SetValue(_taskHost, tabControl.SelectedTab.Text);
+            _taskHost.Properties[Keys.NETWORK_PACKET_SIZE].SetValue(_taskHost, txPacketSize.Text.Trim());
+            _taskHost.Properties[Keys.USE_REGIONAL_SETTINGS].SetValue(_taskHost, chkRegionalSettings.Checked ? Keys.TRUE : Keys.FALSE);
+
+            _taskHost.Properties[Keys.SET_QUOTED_IDENTIFIERS_ON].SetValue(_taskHost, chkQuotes.Checked ? Keys.TRUE : Keys.FALSE);
+            _taskHost.Properties[Keys.CHARACTER_DATA_TYPE].SetValue(_taskHost, chkChDataType.Checked ? Keys.TRUE : Keys.FALSE);
+            _taskHost.Properties[Keys.UNICODE_CHR].SetValue(_taskHost, chkUnicode.Checked ? Keys.TRUE : Keys.FALSE);
 
             var mappingParams = new MappingParams();
             mappingParams.AddRange(from DataGridViewRow row in grdParameters.Rows
@@ -561,9 +599,19 @@ namespace SSISBulkExportTask100
             {
                 case 3:
                     {
+                        SqlDbType sqlDbType;
+                        try
+                        {
+                            sqlDbType = (SqlDbType)Enum.Parse(typeof(SqlDbType), grdParameters.Rows[e.RowIndex].Cells[1].Value.ToString(), true);
+                        }
+                        catch
+                        {
+                            sqlDbType = SqlDbType.NVarChar;
+                        }
+
                         using (ExpressionBuilder expressionBuilder = ExpressionBuilder.Instantiate(_taskHost.Variables,
                                                                                                 _taskHost.VariableDispenser,
-                                                                                                Type.GetType("System.Object"),
+                                                                                                SQLGoodies.ConvertFromSqlDbType(sqlDbType),
                                                                                                 string.Empty))
                         {
                             if (expressionBuilder.ShowDialog() == DialogResult.OK)
