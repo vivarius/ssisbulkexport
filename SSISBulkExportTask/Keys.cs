@@ -176,15 +176,15 @@ namespace SSISBulkExportTask100
 
                     foreach (var param in (MappingParams)StoredProcedureParameters)
                     {
-                        storedProcParams.Append(string.Format("{0}, {1}",
+                        storedProcParams.Append(string.Format("{0} {1}",
                                                               (index > 0)
                                                                     ? ","
                                                                     : string.Empty,
                                                                EvaluateExpression(param.Value, _variableDispenser)));
                         index++;
                     }
-
-                    _stringBuilder.Append(string.Format(@" ""set fmtonly off exec {0}.{1} {2}"" queryout ", Database.Trim(), StoredProcedure.Trim(), storedProcParams));
+                    //set fmtonly off exec
+                    _stringBuilder.Append(string.Format(@" ""exec {0}.{1} {2}"" queryout ", Database.Trim(), StoredProcedure.Trim(), storedProcParams));
                     break;
                 case Keys.TAB_VIEW:
                     _stringBuilder.Append(string.Format(@" ""{0}.{1}"" out ", Database.Trim(), View.Trim()));
@@ -204,7 +204,7 @@ namespace SSISBulkExportTask100
                              select srv).FirstOrDefault();
 
             if (srvVal != null)
-                _stringBuilder.Append(string.Format(" -S{0}", srvVal.Split('=')[1]));
+                _stringBuilder.Append(string.Format(@" -S""{0}""", srvVal.Split('=')[1]));
 
             _stringBuilder.Append(TrustedConnection.Trim() == Keys.TRUE
                                      ? " -T "

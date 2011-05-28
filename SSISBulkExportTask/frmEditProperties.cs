@@ -384,6 +384,15 @@ namespace SSISBulkExportTask100
                                 while (sqlDataReaderTables.Read())
                                 {
                                     cmbStoredProcedures.Items.Add(sqlDataReaderTables.GetString(0));
+                                    if (_taskHost.Properties[Keys.SQL_StoredProcedure].GetValue(_taskHost) != null)
+                                    {
+                                        if (_taskHost.Properties[Keys.SQL_StoredProcedure].GetValue(_taskHost).ToString() == sqlDataReaderTables.GetString(0))
+                                        {
+                                            var spItem = sqlDataReaderTables.GetString(0).Split('.');
+                                            LoadStoredProcedureParameters(spItem[0].Replace("[", string.Empty).Replace("]", string.Empty), spItem[1].Replace("[", string.Empty).Replace("]", string.Empty));
+                                        }
+
+                                    }
                                 }
                         }
                     }
@@ -506,7 +515,7 @@ namespace SSISBulkExportTask100
                                    {
                                        Name = row.Cells[0].Value.ToString(),
                                        Type = row.Cells[1].Value.ToString(),
-                                       Value = row.Cells[5].Value.ToString()
+                                       Value = row.Cells[2].Value.ToString()
                                    });
 
             _taskHost.Properties[Keys.SQL_STORED_PROCEDURE_PARAMS].SetValue(_taskHost, mappingParams);

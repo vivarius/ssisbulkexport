@@ -19,7 +19,7 @@ namespace SSISBulkExportTask100.SSIS
         DisplayName = "Bulk Export Task",
         UITypeName = "SSISBulkExportTask100.SSISBulkExportTaskUIInterface" +
         ",SSISBulkExportTask100," +
-        "Version=1.1.0.34," +
+        "Version=1.1.0.37," +
         "Culture=Neutral," +
         "PublicKeyToken=7660ecf4382af446",
         IconResource = "SSISBulkExportTask100.DownloadIcon.ico",
@@ -241,12 +241,19 @@ namespace SSISBulkExportTask100.SSIS
 
                 foreach (var item in result)
                 {
-                    componentEvents.FireInformation(0,
-                               "SSISBulkExportTask",
-                               item.Trim(),
-                               string.Empty,
-                               0,
-                               ref refire);
+                    if (item.Trim().StartsWith("Error"))
+                        componentEvents.FireError(0,
+                                         "SSISBulkExportTask",
+                                         item.Trim(),
+                                         string.Empty,
+                                         0);
+                    else
+                        componentEvents.FireInformation(0,
+                                   "SSISBulkExportTask",
+                                   item.Trim(),
+                                   string.Empty,
+                                   0,
+                                   ref refire);
                 }
 
                 componentEvents.FireInformation(0,
@@ -263,7 +270,7 @@ namespace SSISBulkExportTask100.SSIS
                                           "SSISBulkExportTask",
                                           string.Format("Problem: {0}",
                                                         ex.Message + "\n" + ex.StackTrace),
-                                          "",
+                                          string.Empty,
                                           0);
             }
             finally
