@@ -347,6 +347,7 @@
             this.btPreview.TabIndex = 41;
             this.btPreview.Text = "Preview";
             this.btPreview.UseVisualStyleBackColor = true;
+            this.btPreview.Click += new System.EventHandler(this.btPreview_Click);
             // 
             // groupBox1
             // 
@@ -478,6 +479,7 @@
             this.label13.Size = new System.Drawing.Size(62, 13);
             this.label13.TabIndex = 11;
             this.label13.Text = "Code page:";
+            this.toolTip1.SetToolTip(this.label13, "SQL Server does not support code page 65001 (UTF-8 encoding).");
             // 
             // chkRightsCMDSHELL
             // 
@@ -506,7 +508,6 @@
             // cmbPassword
             // 
             this.cmbPassword.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbPassword.Enabled = false;
             this.cmbPassword.FormattingEnabled = true;
             this.cmbPassword.Location = new System.Drawing.Point(330, 46);
             this.cmbPassword.Name = "cmbPassword";
@@ -526,7 +527,6 @@
             // cmbLogin
             // 
             this.cmbLogin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbLogin.Enabled = false;
             this.cmbLogin.FormattingEnabled = true;
             this.cmbLogin.Location = new System.Drawing.Point(47, 46);
             this.cmbLogin.Name = "cmbLogin";

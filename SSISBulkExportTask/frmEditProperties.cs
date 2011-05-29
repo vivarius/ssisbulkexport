@@ -41,6 +41,28 @@ namespace SSISBulkExportTask100
             get { return _connections; }
         }
 
+        private bool ValidateControls
+        {
+            get
+            {
+                bool retval = true;
+
+                if (!IsNumeric(txMaxErrors.Text))
+                {
+                    txMaxErrors.Focus();
+                    retval = false;
+                }
+
+                if (!IsNumeric(txPacketSize.Text))
+                {
+                    txPacketSize.Focus();
+                    retval = false;
+                }
+
+                return retval;
+            }
+        }
+
         #endregion
 
         #region .ctor
@@ -109,10 +131,12 @@ namespace SSISBulkExportTask100
                     if (_taskHost.Properties[Keys.DESTINATION_FILE_CONNECTION].GetValue(_taskHost).ToString() == Keys.TRUE)
                     {
                         optFileConnection.Checked = true;
+                        cmdFileVariable.Enabled = false;
                         LoadFileConnectionsDestination();
                     }
                     else
                     {
+                        cmdFileVariable.Enabled = true;
                         optFileVariable.Checked = true;
                         LoadFileVariablesDestination();
                     }
@@ -120,6 +144,7 @@ namespace SSISBulkExportTask100
                 else
                 {
                     optFileConnection.Checked = true;
+                    cmdFileVariable.Enabled = false;
                     LoadFileConnectionsDestination();
                 }
 
@@ -128,17 +153,20 @@ namespace SSISBulkExportTask100
                     if (_taskHost.Properties[Keys.FORMAT_FILE_CONNECTION].GetValue(_taskHost).ToString() == Keys.TRUE)
                     {
                         optFileFormatConnection.Checked = true;
+                        cmdFileFormatVariable.Enabled = false;
                         LoadFileConnectionsFileFormat();
                     }
                     else
                     {
                         optFileFormatVariable.Checked = true;
+                        cmdFileFormatVariable.Enabled = true;
                         LoadFileVariablesFileFormat();
                     }
                 }
                 else
                 {
                     optFileFormatConnection.Checked = true;
+                    cmdFileFormatVariable.Enabled = false;
                     LoadFileConnectionsFileFormat();
                 }
 
@@ -434,7 +462,7 @@ namespace SSISBulkExportTask100
                                                                        Value = sqlDataReaderTables.GetString(2)
                                                                    };
 
-                                row.Cells["grdColVars"] = LoadCellVariables();
+                                row.Cells["grdColVars"] = LoadCellVariables(sqlDataReaderTables.GetString(2));
 
                                 row.Cells["grdColExpression"] = new DataGridViewButtonCell();
                             }
@@ -462,6 +490,11 @@ namespace SSISBulkExportTask100
             Cursor = Cursors.Arrow;
         }
 
+        private static bool IsNumeric(IEnumerable<char> strToTest)
+        {
+            return strToTest.ToArray().All(Char.IsNumber);
+        }
+
         #endregion
 
         #region Events
@@ -473,6 +506,12 @@ namespace SSISBulkExportTask100
 
         private void btSave_Click(object sender, EventArgs e)
         {
+            if (!ValidateControls)
+            {
+                MessageBox.Show("Please validate the values entered into the text controls");
+                return;
+            }
+
             _taskHost.Properties[Keys.SQL_SERVER].SetValue(_taskHost, cmbSQLServer.Text);
 
             _taskHost.Properties[Keys.FORMAT_FILE_CONNECTION].SetValue(_taskHost, optFileFormatConnection.Checked ? Keys.TRUE : Keys.FALSE);
@@ -512,11 +551,11 @@ namespace SSISBulkExportTask100
             var mappingParams = new MappingParams();
             mappingParams.AddRange(from DataGridViewRow row in grdParameters.Rows
                                    select new MappingParam
-                                   {
-                                       Name = row.Cells[0].Value.ToString(),
-                                       Type = row.Cells[1].Value.ToString(),
-                                       Value = row.Cells[2].Value.ToString()
-                                   });
+                                              {
+                                                  Name = row.Cells[0].Value.ToString(),
+                                                  Type = row.Cells[1].Value.ToString(),
+                                                  Value = row.Cells[2].Value.ToString()
+                                              });
 
             _taskHost.Properties[Keys.SQL_STORED_PROCEDURE_PARAMS].SetValue(_taskHost, mappingParams);
 
@@ -524,19 +563,31 @@ namespace SSISBulkExportTask100
                           where db.Contains("Initial Catalog")
                           select db).FirstOrDefault();
 
-            _taskHost.Properties[Keys.SQL_DATABASE].SetValue(_taskHost, string.Format("[{0}]", val.Split('=')[1]));
+            if (val != null)
+                _taskHost.Properties[Keys.SQL_DATABASE].SetValue(_taskHost, string.Format("[{0}]", val.Split('=')[1]));
 
             DialogResult = DialogResult.OK;
             Close();
         }
 
-        private DataGridViewComboBoxCell LoadCellVariables()
+        private DataGridViewComboBoxCell LoadCellVariables(string dataType)
         {
             var comboBoxCell = new DataGridViewComboBoxCell();
 
+            SqlDbType sqlDbType;
+            try
+            {
+                sqlDbType = (SqlDbType)Enum.Parse(typeof(SqlDbType), dataType, true);
+            }
+            catch
+            {
+                sqlDbType = SqlDbType.NVarChar;
+            }
+
             foreach (Variable variable in Variables)
             {
-                comboBoxCell.Items.Add(string.Format("@[{0}::{1}]", variable.Namespace, variable.Name));
+                if (variable.DataType.ToString() == SQLGoodies.ConvertFromSqlDbType(sqlDbType).Name)
+                    comboBoxCell.Items.Add(string.Format("@[{0}::{1}]", variable.Namespace, variable.Name));
             }
 
             return comboBoxCell;
@@ -549,7 +600,7 @@ namespace SSISBulkExportTask100
 
         private void chkTrustedConnection_Click(object sender, EventArgs e)
         {
-            label10.Enabled = label11.Enabled = cmbLogin.Enabled = cmbPassword.Enabled = (chkTrustedConnection.Checked) ? false : true;
+            label10.Enabled = label11.Enabled = cmbLogin.Enabled = cmbPassword.Enabled = !chkTrustedConnection.Checked;
         }
 
         private void optFileConnection_Click(object sender, EventArgs e)
@@ -635,8 +686,6 @@ namespace SSISBulkExportTask100
             }
         }
 
-        #endregion
-
         private void optFileConnection_CheckedChanged_1(object sender, EventArgs e)
         {
             cmdFileVariable.Enabled = false;
@@ -665,5 +714,15 @@ namespace SSISBulkExportTask100
         {
 
         }
+
+        private void btPreview_Click(object sender, EventArgs e)
+        {
+            using (var frmPreview = new frmPreview())
+            {
+                frmPreview.ShowDialog();
+            }
+        }
+
+        #endregion
     }
 }

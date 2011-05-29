@@ -19,7 +19,7 @@ namespace SSISBulkExportTask100.SSIS
         DisplayName = "Bulk Export Task",
         UITypeName = "SSISBulkExportTask100.SSISBulkExportTaskUIInterface" +
         ",SSISBulkExportTask100," +
-        "Version=1.1.0.37," +
+        "Version=1.1.0.49," +
         "Culture=Neutral," +
         "PublicKeyToken=7660ecf4382af446",
         IconResource = "SSISBulkExportTask100.DownloadIcon.ico",
@@ -746,6 +746,9 @@ namespace SSISBulkExportTask100.SSIS
                 CodePage = node.Attributes.GetNamedItem(Keys.CODE_PAGE).Value;
                 NetworkPacketSize = node.Attributes.GetNamedItem(Keys.NETWORK_PACKET_SIZE).Value;
                 UseRegionalSettings = node.Attributes.GetNamedItem(Keys.USE_REGIONAL_SETTINGS).Value;
+                UseCharacterDataType = node.Attributes.GetNamedItem(Keys.CHARACTER_DATA_TYPE).Value;
+                UseUnicodeCharacters = node.Attributes.GetNamedItem(Keys.UNICODE_CHR).Value;
+                SET_QUOTED_IDENTIFIERS_ON = node.Attributes.GetNamedItem(Keys.SET_QUOTED_IDENTIFIERS_ON).Value;
             }
             catch
             {
