@@ -694,7 +694,7 @@ namespace SSISBulkExportTask100
                         using (ExpressionBuilder expressionBuilder = ExpressionBuilder.Instantiate(_taskHost.Variables,
                                                                                                 _taskHost.VariableDispenser,
                                                                                                 SQLGoodies.ConvertFromSqlDbType(sqlDbType),
-                                                                                                string.Empty))
+                                                                                                grdParameters.Rows[e.RowIndex].Cells[e.ColumnIndex - 1].Value.ToString()))
                         {
                             if (expressionBuilder.ShowDialog() == DialogResult.OK)
                             {
