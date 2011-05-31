@@ -382,6 +382,8 @@
             // chkChDataType
             // 
             this.chkChDataType.AutoSize = true;
+            this.chkChDataType.Checked = true;
+            this.chkChDataType.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkChDataType.Location = new System.Drawing.Point(371, 98);
             this.chkChDataType.Name = "chkChDataType";
             this.chkChDataType.Size = new System.Drawing.Size(149, 17);
@@ -437,8 +439,8 @@
             this.chkRegionalSettings.TabIndex = 15;
             this.chkRegionalSettings.Text = "Use the regional locale setting";
             this.toolTip1.SetToolTip(this.chkRegionalSettings, "Specifies that currency, date, and time data is bulk copied into SQL Server using" +
-        " the regional format defined for the locale setting of the client computer. By d" +
-        "efault, regional settings are ignored.");
+                    " the regional format defined for the locale setting of the client computer. By d" +
+                    "efault, regional settings are ignored.");
             this.chkRegionalSettings.UseVisualStyleBackColor = true;
             // 
             // txPacketSize
@@ -554,8 +556,8 @@
             this.chkTrustedConnection.TabIndex = 0;
             this.chkTrustedConnection.Text = "Use a trusted connection using integrated security";
             this.toolTip1.SetToolTip(this.chkTrustedConnection, "Connects to SQL Server with a trusted connection using integrated security. The s" +
-        "ecurity credentials of the network user, login_id, and password are not required" +
-        ". \r\n");
+                    "ecurity credentials of the network user, login_id, and password are not required" +
+                    ". \r\n");
             this.chkTrustedConnection.UseVisualStyleBackColor = true;
             this.chkTrustedConnection.CheckedChanged += new System.EventHandler(this.chkTrustedConnection_CheckedChanged);
             this.chkTrustedConnection.Click += new System.EventHandler(this.chkTrustedConnection_Click);
@@ -576,7 +578,7 @@
             this.label9.TabIndex = 7;
             this.label9.Text = "Row terminator:";
             this.toolTip1.SetToolTip(this.label9, "Specifies the row terminator. The default is \\n (newline character). Use this par" +
-        "ameter to override the default row terminator.\r\n");
+                    "ameter to override the default row terminator.\r\n");
             // 
             // txFieldTerminator
             // 
@@ -598,20 +600,18 @@
             this.label4.TabIndex = 5;
             this.label4.Text = "Field terminator:";
             this.toolTip1.SetToolTip(this.label4, "Specifies the field terminator. The default is \\t (tab character). Use this param" +
-        "eter to override the default field terminator. \r\n");
+                    "eter to override the default field terminator. \r\n");
             // 
             // chkNativeDatabase
             // 
             this.chkNativeDatabase.AutoSize = true;
-            this.chkNativeDatabase.Checked = true;
-            this.chkNativeDatabase.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkNativeDatabase.Location = new System.Drawing.Point(15, 127);
             this.chkNativeDatabase.Name = "chkNativeDatabase";
             this.chkNativeDatabase.Size = new System.Drawing.Size(183, 17);
             this.chkNativeDatabase.TabIndex = 4;
             this.chkNativeDatabase.Text = "Use native data types of the data";
             this.toolTip1.SetToolTip(this.chkNativeDatabase, "Performs the bulk-copy operation using the native (database) data types of the da" +
-        "ta. This option does not prompt for each field; it uses the native values.\r\n");
+                    "ta. This option does not prompt for each field; it uses the native values.\r\n");
             this.chkNativeDatabase.UseVisualStyleBackColor = true;
             // 
             // txLastRow
@@ -800,6 +800,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Edit task properties";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmEditProperties_FormClosing);
             this.tabControl.ResumeLayout(false);
             this.tabSQL.ResumeLayout(false);
             this.tabSQL.PerformLayout();

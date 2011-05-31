@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using Microsoft.DataTransformationServices.Controls;
 using Microsoft.SqlServer.Dts.Runtime;
@@ -39,28 +41,6 @@ namespace SSISBulkExportTask100
         private Connections Connections
         {
             get { return _connections; }
-        }
-
-        private bool ValidateControls
-        {
-            get
-            {
-                bool retval = true;
-
-                if (!IsNumeric(txMaxErrors.Text))
-                {
-                    txMaxErrors.Focus();
-                    retval = false;
-                }
-
-                if (!IsNumeric(txPacketSize.Text))
-                {
-                    txPacketSize.Focus();
-                    retval = false;
-                }
-
-                return retval;
-            }
         }
 
         #endregion
@@ -109,6 +89,14 @@ namespace SSISBulkExportTask100
                     Boolean.TryParse(_taskHost.Properties[Keys.USE_REGIONAL_SETTINGS].GetValue(_taskHost).ToString(),
                                      out isCheckedRegionalSettings);
                     chkRegionalSettings.Checked = isCheckedRegionalSettings;
+                }
+
+                if (_taskHost.Properties[Keys.NATIVE_DB_DATATYPE].GetValue(_taskHost) != null)
+                {
+                    bool isNativeDBType;
+                    Boolean.TryParse(_taskHost.Properties[Keys.NATIVE_DB_DATATYPE].GetValue(_taskHost).ToString(),
+                                     out isNativeDBType);
+                    chkNativeDatabase.Checked = isNativeDBType;
                 }
 
                 if (_taskHost.Properties[Keys.FIRSTROW].GetValue(_taskHost) != null)
@@ -170,11 +158,10 @@ namespace SSISBulkExportTask100
                     LoadFileConnectionsFileFormat();
                 }
 
-                string selectedItem = string.Empty;
-
                 cmbLogin.Items.Clear();
                 cmbPassword.Items.Clear();
-                cmbPassword = cmbLogin = LoadVariables("System.String", ref selectedItem);
+                cmbLogin.Items.AddRange(LoadVariables("System.String").ToArray());
+                cmbPassword.Items.AddRange(LoadVariables("System.String").ToArray());
 
                 if (_taskHost.Properties[Keys.TRUSTED_CONNECTION].GetValue(_taskHost) != null)
                 {
@@ -183,6 +170,12 @@ namespace SSISBulkExportTask100
                     chkTrustedConnection.Checked = isCheckedTrustedConnection;
                     label10.Enabled = label11.Enabled = cmbPassword.Enabled = cmbLogin.Enabled = !chkTrustedConnection.Checked;
                 }
+                else
+                {
+                    chkTrustedConnection.Checked = true;
+                }
+
+                label10.Enabled = label11.Enabled = cmbLogin.Enabled = cmbPassword.Enabled = !chkTrustedConnection.Checked;
 
                 if (_taskHost.Properties[Keys.SET_QUOTED_IDENTIFIERS_ON].GetValue(_taskHost) != null)
                 {
@@ -208,6 +201,9 @@ namespace SSISBulkExportTask100
                 if (_taskHost.Properties[Keys.SQL_STATEMENT].GetValue(_taskHost) != null)
                     txSQL.Text = _taskHost.Properties[Keys.SQL_STATEMENT].GetValue(_taskHost).ToString();
 
+                if (_taskHost.Properties[Keys.MAX_ERRORS].GetValue(_taskHost) != null)
+                    txMaxErrors.Text = _taskHost.Properties[Keys.MAX_ERRORS].GetValue(_taskHost).ToString();
+
                 if (_taskHost.Properties[Keys.SQL_VIEW].GetValue(_taskHost) != null)
                     cmbViews.SelectedIndex = FindStringInComboBox(cmbViews, _taskHost.Properties[Keys.SQL_VIEW].GetValue(_taskHost).ToString(), -1);
 
@@ -227,7 +223,7 @@ namespace SSISBulkExportTask100
                     cmbLogin.SelectedIndex = FindStringInComboBox(cmbLogin, _taskHost.Properties[Keys.SRV_LOGIN].GetValue(_taskHost).ToString(), -1);
 
                 if (_taskHost.Properties[Keys.SRV_PASSWORD].GetValue(_taskHost) != null)
-                    cmbPassword.SelectedIndex = FindStringInComboBox(cmbDestination, _taskHost.Properties[Keys.SRV_PASSWORD].GetValue(_taskHost).ToString(), -1);
+                    cmbPassword.SelectedIndex = FindStringInComboBox(cmbPassword, _taskHost.Properties[Keys.SRV_PASSWORD].GetValue(_taskHost).ToString(), -1);
 
                 if (_taskHost.Properties[Keys.CODE_PAGE].GetValue(_taskHost) != null)
                     cmbCodePage.Text = _taskHost.Properties[Keys.CODE_PAGE].GetValue(_taskHost).ToString();
@@ -479,8 +475,10 @@ namespace SSISBulkExportTask100
                 if (mappingParams != null)
                     foreach (MappingParam mappingParam in mappingParams)
                     {
-                        foreach (DataGridViewRow row in grdParameters.Rows.Cast<DataGridViewRow>().Where(row => row.Cells[0].Value.ToString() == mappingParam.Name))
+                        foreach (DataGridViewRow row in
+                            grdParameters.Rows.Cast<DataGridViewRow>().Where(row => row.Cells[0].Value.ToString() == mappingParam.Name))
                         {
+                            ((DataGridViewComboBoxCell)row.Cells[2]).Items.Add(mappingParam.Value);
                             row.Cells[2].Value = mappingParam.Value;
                         }
                     }
@@ -506,9 +504,29 @@ namespace SSISBulkExportTask100
 
         private void btSave_Click(object sender, EventArgs e)
         {
-            if (!ValidateControls)
+            if (txMaxErrors.Text.Trim().Length > 0)
+                if (!IsNumeric(txMaxErrors.Text))
+                {
+                    txMaxErrors.Focus();
+                    MessageBox.Show("Max. Errors field must be an integer value!");
+                    DialogResult = DialogResult.Cancel;
+                    return;
+                }
+
+            if (txMaxErrors.Text.Trim().Length > 0)
+                if (!IsNumeric(txMaxErrors.Text))
+                {
+                    txPacketSize.Focus();
+                    MessageBox.Show("Network packet size field must be an integer value!");
+                    DialogResult = DialogResult.Cancel;
+                    return;
+                }
+
+            if (cmbDestination.Text.Trim().Length == 0)
             {
-                MessageBox.Show("Please validate the values entered into the text controls");
+                cmbDestination.Focus();
+                MessageBox.Show("You have to specify a destination!");
+                DialogResult = DialogResult.Cancel;
                 return;
             }
 
@@ -543,6 +561,7 @@ namespace SSISBulkExportTask100
             _taskHost.Properties[Keys.DATA_SOURCE].SetValue(_taskHost, tabControl.SelectedTab.Text);
             _taskHost.Properties[Keys.NETWORK_PACKET_SIZE].SetValue(_taskHost, txPacketSize.Text.Trim());
             _taskHost.Properties[Keys.USE_REGIONAL_SETTINGS].SetValue(_taskHost, chkRegionalSettings.Checked ? Keys.TRUE : Keys.FALSE);
+            _taskHost.Properties[Keys.MAX_ERRORS].SetValue(_taskHost, txMaxErrors.Text.Trim());
 
             _taskHost.Properties[Keys.SET_QUOTED_IDENTIFIERS_ON].SetValue(_taskHost, chkQuotes.Checked ? Keys.TRUE : Keys.FALSE);
             _taskHost.Properties[Keys.CHARACTER_DATA_TYPE].SetValue(_taskHost, chkChDataType.Checked ? Keys.TRUE : Keys.FALSE);
@@ -566,13 +585,16 @@ namespace SSISBulkExportTask100
             if (val != null)
                 _taskHost.Properties[Keys.SQL_DATABASE].SetValue(_taskHost, string.Format("[{0}]", val.Split('=')[1]));
 
-            DialogResult = DialogResult.OK;
-            Close();
+            if (DialogResult == DialogResult.OK)
+                Close();
         }
 
         private DataGridViewComboBoxCell LoadCellVariables(string dataType)
         {
-            var comboBoxCell = new DataGridViewComboBoxCell();
+            var comboBoxCell = new DataGridViewComboBoxCell
+                                   {
+                                       ReadOnly = false
+                                   };
 
             SqlDbType sqlDbType;
             try
@@ -721,6 +743,12 @@ namespace SSISBulkExportTask100
             {
                 frmPreview.ShowDialog();
             }
+        }
+
+        private void frmEditProperties_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (DialogResult == DialogResult.Cancel)
+                e.Cancel = true;
         }
 
         #endregion

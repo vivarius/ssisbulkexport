@@ -19,7 +19,7 @@ namespace SSISBulkExportTask100.SSIS
         DisplayName = "Bulk Export Task",
         UITypeName = "SSISBulkExportTask100.SSISBulkExportTaskUIInterface" +
         ",SSISBulkExportTask100," +
-        "Version=1.1.0.49," +
+        "Version=1.2.0.4," +
         "Culture=Neutral," +
         "PublicKeyToken=7660ecf4382af446",
         IconResource = "SSISBulkExportTask100.DownloadIcon.ico",
@@ -90,6 +90,8 @@ namespace SSISBulkExportTask100.SSIS
         public string UseUnicodeCharacters { get; set; }
         [Category("Component specific"), Description("Performs the operation using a character data type. This option does not prompt for each field; it uses char as the storage type, without prefixes and with \t (tab character) as the field separator and \r\n (newline character) as the row terminator.")]
         public string UseCharacterDataType { get; set; }
+        [Category("Component specific"), Description("Specifies the maximum number of syntax errors that can occur before the bcp operation is canceled. A syntax error implies a data conversion error to the target data type. The max_errors total excludes any errors that can be detected only at the server, such as constraint violations.\nA row that cannot be copied by the bcp utility is ignored and is counted as one error. If this option is not included, the default is 10.")]
+        public string MaxErrors { get; set; }
         #endregion
 
         #region Private Properties
@@ -218,7 +220,8 @@ namespace SSISBulkExportTask100.SSIS
                                   UseRegionalSettings = UseRegionalSettings,
                                   SET_QUOTED_IDENTIFIERS_ON = SET_QUOTED_IDENTIFIERS_ON,
                                   UseUnicodeCharacters = UseUnicodeCharacters,
-                                  UseCharacterDataType = UseCharacterDataType
+                                  UseCharacterDataType = UseCharacterDataType,
+                                  MaxErrors = MaxErrors
                               };
 
                 string commandBulkExport = bcp.ToString();
@@ -676,6 +679,9 @@ namespace SSISBulkExportTask100.SSIS
             XmlAttribute characterDataType = doc.CreateAttribute(string.Empty, Keys.CHARACTER_DATA_TYPE, string.Empty);
             characterDataType.Value = UseCharacterDataType;
 
+            XmlAttribute maxErrors = doc.CreateAttribute(string.Empty, Keys.MAX_ERRORS, string.Empty);
+            maxErrors.Value = MaxErrors;
+
             taskElement.Attributes.Append(sqlServer);
             taskElement.Attributes.Append(dataSource);
             taskElement.Attributes.Append(dataBase);
@@ -703,7 +709,7 @@ namespace SSISBulkExportTask100.SSIS
             taskElement.Attributes.Append(setQuotedIdentifiersOn);
             taskElement.Attributes.Append(useUnicodeChr);
             taskElement.Attributes.Append(characterDataType);
-
+            taskElement.Attributes.Append(maxErrors);
 
             doc.AppendChild(taskElement);
         }
@@ -723,7 +729,8 @@ namespace SSISBulkExportTask100.SSIS
             try
             {
                 SQLServerInstance = node.Attributes.GetNamedItem(Keys.SQL_SERVER).Value;
-                DataSource = node.Attributes.GetNamedItem(Keys.DATA_SOURCE).Value;
+                DataSource = node.Attributes.GetNamedItem(Keys.DATA_SOURCE).Value; 
+                MaxErrors = node.Attributes.GetNamedItem(Keys.MAX_ERRORS).Value;
                 Database = node.Attributes.GetNamedItem(Keys.SQL_DATABASE).Value;
                 SQLStatment = node.Attributes.GetNamedItem(Keys.SQL_STATEMENT).Value;
                 View = node.Attributes.GetNamedItem(Keys.SQL_VIEW).Value;

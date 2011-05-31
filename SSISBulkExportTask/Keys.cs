@@ -36,6 +36,7 @@ namespace SSISBulkExportTask100
         public const string NETWORK_PACKET_SIZE = "NetworkPacketSize";
         public const string CODE_PAGE = "CodePage";
         public const string USE_REGIONAL_SETTINGS = "UseRegionalSettings";
+        public const string MAX_ERRORS = "MaxErrors";
 
         public const string SET_QUOTED_IDENTIFIERS_ON = "SET_QUOTED_IDENTIFIERS_ON";
         public const string UNICODE_CHR = "UseUnicodeCharacters";
@@ -112,6 +113,7 @@ namespace SSISBulkExportTask100
         public string SET_QUOTED_IDENTIFIERS_ON { get; set; }
         public string UseUnicodeCharacters { get; set; }
         public string UseCharacterDataType { get; set; }
+        public string MaxErrors { get; set; }
         #endregion
 
         #region .ctor
@@ -180,10 +182,14 @@ namespace SSISBulkExportTask100
                                                               (index > 0)
                                                                     ? ","
                                                                     : string.Empty,
-                                                               EvaluateExpression(param.Value, _variableDispenser)));
+                                                              (param.Type.ToLower().Contains("char") ||
+                                                               param.Type.ToLower().Contains("date") ||
+                                                               param.Type.ToLower().Contains("text"))
+                                                                     ? string.Format("'{0}'", EvaluateExpression(param.Value, _variableDispenser))
+                                                                     : EvaluateExpression(param.Value, _variableDispenser)));
                         index++;
                     }
-                    //set fmtonly off exec
+
                     _stringBuilder.Append(string.Format(@" ""exec {0}.{1} {2}"" queryout ", Database.Trim(), StoredProcedure.Trim(), storedProcParams));
                     break;
                 case Keys.TAB_VIEW:
@@ -208,7 +214,7 @@ namespace SSISBulkExportTask100
 
             _stringBuilder.Append(TrustedConnection.Trim() == Keys.TRUE
                                      ? " -T "
-                                     : string.Format(" -U{0} -P{1} ",
+                                     : string.Format(@" -U""{0}"" -P""{1}"" ",
                                                      EvaluateExpression(Login, _variableDispenser),
                                                      EvaluateExpression(Password, _variableDispenser)));
 
@@ -225,6 +231,11 @@ namespace SSISBulkExportTask100
             if (!string.IsNullOrEmpty(LastRow.Trim()))
             {
                 _stringBuilder.Append(string.Format(" -L{0}", LastRow));
+            }
+
+            if (!string.IsNullOrEmpty(MaxErrors.Trim()))
+            {
+                _stringBuilder.Append(string.Format(" -m{0}", MaxErrors));
             }
 
             if (NativeDatabaseDataType == Keys.TRUE)
