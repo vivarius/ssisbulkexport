@@ -190,7 +190,7 @@ namespace SSISBulkExportTask100
                         index++;
                     }
 
-                    _stringBuilder.Append(string.Format(@" ""exec {0}.{1} {2}"" queryout ", Database.Trim(), StoredProcedure.Trim(), storedProcParams));
+                    _stringBuilder.Append(string.Format(@" ""SET FMTONLY OFF exec {0}.{1} {2}"" queryout ", Database.Trim(), StoredProcedure.Trim(), storedProcParams));
                     break;
                 case Keys.TAB_VIEW:
                     _stringBuilder.Append(string.Format(@" ""{0}.{1}"" out ", Database.Trim(), View.Trim()));

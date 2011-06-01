@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.DataTransformationServices.Controls;
 using Microsoft.SqlServer.Dts.Runtime;
@@ -739,7 +740,75 @@ namespace SSISBulkExportTask100
 
         private void btPreview_Click(object sender, EventArgs e)
         {
-            using (var frmPreview = new frmPreview())
+            var stringBuilder = new StringBuilder();
+
+            string val = (_connections[cmbSQLServer.Text].ConnectionString.Split(';')
+                        .Where(delegate(string db)
+                                {
+                                    return db.Contains("Initial Catalog");
+                                })).FirstOrDefault().Split('=')[1];
+
+            switch (tabControl.SelectedTab.Text)
+            {
+                case Keys.TAB_SQL:
+
+                    var sql = txSQL.Text.Trim();
+                    var sqlEx = sql;
+
+                    if (!Regex.Match(sql.Replace(" ", string.Empty), "selecttop", RegexOptions.IgnoreCase).Success)
+                    {
+                        const string select = "select";
+                        const string top = " top 100 ";
+
+                        if (Regex.Match(sql, select, RegexOptions.IgnoreCase).Success)
+                        {
+                            sqlEx = sqlEx.Insert(select.Length + 1, top);
+                        }
+                    }
+
+                    stringBuilder.Append(string.Format(@"{0}", Regex.Replace(sqlEx, "(\n|\r)+", string.Empty)));
+                    break;
+                case Keys.TAB_SP:
+                    StringBuilder storedProcParams = new StringBuilder();
+
+                    int index = 0;
+
+                    var mappingParams = new MappingParams();
+                    mappingParams.AddRange(from DataGridViewRow row in grdParameters.Rows
+                                           select new MappingParam
+                                                      {
+                                                          Name = row.Cells[0].Value.ToString(),
+                                                          Type = row.Cells[1].Value.ToString(),
+                                                          Value = row.Cells[2].Value.ToString()
+                                                      });
+
+                    foreach (var param in mappingParams)
+                    {
+                        storedProcParams.Append(string.Format("{0} {1}",
+                                                              (index > 0)
+                                                                    ? ","
+                                                                    : string.Empty,
+                                                              (param.Type.ToLower().Contains("char") ||
+                                                               param.Type.ToLower().Contains("date") ||
+                                                               param.Type.ToLower().Contains("text"))
+                                                                     ? string.Format("'{0}'", EvaluateExpression(param.Value, _taskHost.VariableDispenser))
+                                                                     : EvaluateExpression(param.Value, _taskHost.VariableDispenser)));
+                        index++;
+                    }
+
+                    stringBuilder.Append(string.Format(@"SELECT TOP 100 * FROM OPENROWSET ('SQLOLEDB','Server=(local);TRUSTED_CONNECTION=YES;','set fmtonly off exec [{0}].{1} {2}')", val.Trim(), cmbStoredProcedures.Text.Trim(), storedProcParams));
+                    break;
+                case Keys.TAB_VIEW:
+                    stringBuilder.Append(string.Format(@"SELECT TOP 100 * FROM {0}", cmbViews.Text.Trim()));
+                    break;
+                case Keys.TAB_TABLES:
+                    stringBuilder.Append(string.Format(@"SELECT TOP 100 * FROM {0}", cmbTables.Text));
+                    break;
+            }
+
+            using (var frmPreview = new frmPreview(EvaluateExpression(_connections[cmbSQLServer.Text].ConnectionString, _taskHost.VariableDispenser).ToString(),
+                                                   tabControl.SelectedTab.Text,
+                                                   stringBuilder.ToString()))
             {
                 frmPreview.ShowDialog();
             }
@@ -752,5 +821,11 @@ namespace SSISBulkExportTask100
         }
 
         #endregion
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
+            Close();
+        }
     }
 }

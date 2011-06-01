@@ -19,7 +19,7 @@ namespace SSISBulkExportTask100.SSIS
         DisplayName = "Bulk Export Task",
         UITypeName = "SSISBulkExportTask100.SSISBulkExportTaskUIInterface" +
         ",SSISBulkExportTask100," +
-        "Version=1.3.0.0," +
+        "Version=1.3.0.10," +
         "Culture=Neutral," +
         "PublicKeyToken=7660ecf4382af446",
         IconResource = "SSISBulkExportTask100.DownloadIcon.ico",
