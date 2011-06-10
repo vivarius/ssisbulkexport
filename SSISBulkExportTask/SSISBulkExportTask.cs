@@ -386,6 +386,26 @@ namespace SSISBulkExportTask100.SSIS
         }
 
         /// <summary>
+        /// Determines whether [is variable in lock for read or write] [the specified lock for read].
+        /// </summary>
+        /// <param name="lockForRead">The lock for read.</param>
+        /// <param name="variable">The variable.</param>
+        /// <returns>
+        /// 	<c>true</c> if [is variable in lock for read or write] [the specified lock for read]; otherwise, <c>false</c>.
+        /// </returns>
+        private static bool IsVariableInLockForReadOrWrite(List<string> lockForRead, string variable)
+        {
+            bool retVal = lockForRead.Contains(variable);
+
+            if (!retVal)
+            {
+                lockForRead.Add(variable);
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
         /// Gets the needed variables.
         /// </summary>
         /// <param name="variableDispenser">The variable dispenser.</param>
@@ -393,6 +413,7 @@ namespace SSISBulkExportTask100.SSIS
         private void GetNeededVariables(VariableDispenser variableDispenser, IDTSComponentEvents componentEvents)
         {
             bool refire = false;
+            List<string> lockForRead = new List<string>();
 
             try
             {
@@ -416,7 +437,8 @@ namespace SSISBulkExportTask100.SSIS
                                 componentEvents.FireInformation(0, "SSISBulkExportTask",
                                                                 nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')),
                                                                 string.Empty, 0, ref refire);
-                                variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
+                                if (!IsVariableInLockForReadOrWrite(lockForRead, nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']'))))
+                                    variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
                             }
                             catch (Exception exception)
                             {
@@ -447,7 +469,8 @@ namespace SSISBulkExportTask100.SSIS
                                 componentEvents.FireInformation(0, "SSISBulkExportTask",
                                                                 nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')),
                                                                 string.Empty, 0, ref refire);
-                                variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
+                                if (!IsVariableInLockForReadOrWrite(lockForRead, nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']'))))
+                                    variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
                             }
                             catch (Exception exception)
                             {
@@ -478,7 +501,8 @@ namespace SSISBulkExportTask100.SSIS
                                 componentEvents.FireInformation(0, "SSISBulkExportTask",
                                                                 nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')),
                                                                 string.Empty, 0, ref refire);
-                                variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
+                                if (!IsVariableInLockForReadOrWrite(lockForRead, nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']'))))
+                                    variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
                             }
                             catch (Exception exception)
                             {
@@ -508,7 +532,8 @@ namespace SSISBulkExportTask100.SSIS
                                 componentEvents.FireInformation(0, "SSISBulkExportTask",
                                                                 nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')),
                                                                 string.Empty, 0, ref refire);
-                                variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
+                                if (!IsVariableInLockForReadOrWrite(lockForRead, nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']'))))
+                                    variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
                             }
                             catch (Exception exception)
                             {
@@ -538,7 +563,8 @@ namespace SSISBulkExportTask100.SSIS
                                 componentEvents.FireInformation(0, "SSISBulkExportTask",
                                                                 nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')),
                                                                 string.Empty, 0, ref refire);
-                                variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
+                                if (!IsVariableInLockForReadOrWrite(lockForRead, nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']'))))
+                                    variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
                             }
                             catch (Exception exception)
                             {
@@ -563,7 +589,8 @@ namespace SSISBulkExportTask100.SSIS
                                     try
                                     {
                                         componentEvents.FireInformation(0, "SSISBulkExportTask", nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')), string.Empty, 0, ref refire);
-                                        variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
+                                        if (!IsVariableInLockForReadOrWrite(lockForRead, nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']'))))
+                                            variableDispenser.LockForRead(nexSplitedVal[1].Remove(nexSplitedVal[1].IndexOf(']')));
                                     }
                                     catch { }
                                 }
@@ -729,7 +756,7 @@ namespace SSISBulkExportTask100.SSIS
             try
             {
                 SQLServerInstance = node.Attributes.GetNamedItem(Keys.SQL_SERVER).Value;
-                DataSource = node.Attributes.GetNamedItem(Keys.DATA_SOURCE).Value; 
+                DataSource = node.Attributes.GetNamedItem(Keys.DATA_SOURCE).Value;
                 MaxErrors = node.Attributes.GetNamedItem(Keys.MAX_ERRORS).Value;
                 Database = node.Attributes.GetNamedItem(Keys.SQL_DATABASE).Value;
                 SQLStatment = node.Attributes.GetNamedItem(Keys.SQL_STATEMENT).Value;
