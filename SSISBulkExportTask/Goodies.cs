@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.Mail;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using Microsoft.SqlServer.Dts.Runtime;
 using Microsoft.SqlServer.Dts.Runtime.Wrapper;
 using VariableDispenser = Microsoft.SqlServer.Dts.Runtime.VariableDispenser;
@@ -51,6 +54,35 @@ namespace SSISBulkExportTask100
         public const string TAB_VIEW = "View";
         public const string TAB_SP = "Stored Procedure";
         public const string TAB_TABLES = "Tables";
+
+        public const string SEND_FILE_BY_EMAIL = "SendFileByEmail";
+        public const string SMTP_SERVER = "SmtpServer";
+        public const string RECIPIENTS = "SmtpRecipients";
+        public const string FROM = "SmtpFrom";
+        public const string EMAIL_SUBJECT = "EmailSubject";
+        public const string EMAIL_BODY = "EmailBody";
+
+        public const string REGEX_EMAIL = @"^[a-z0-9][a-z0-9_\.-]{0,}[a-z0-9]@[a-z0-9][a-z0-9_\.-]{0,}[a-z0-9][\.][a-z0-9]{2,4}$";
+
+        public static Dictionary<string, string> BodyKeys = new Dictionary<string, string>
+                                                                {
+                                                                    {"File path", "${FilePath}"},
+                                                                    {"File size", "${FileSize}"},
+                                                                    {"Start Time", "${StartTime}"},
+                                                                    {"End Time", "${EndTime}"},
+                                                                    {"Total Execution Time", "${TotalExecutionTime}"},
+                                                                    {"Rows Copied", "${RowsCopied}"}
+                                                                };
+
+        public static Dictionary<string, string> BodyKeysConcreteValue = new Dictionary<string, string>
+                                                                {
+                                                                    {"${FilePath}", "Path"},
+                                                                    {"${FileSize}", "Size"},
+                                                                    {"${StartTime}", "StartTime"},
+                                                                    {"${EndTime}", "EndTime"},
+                                                                    {"${TotalExecutionTime}", "GetExecutionTime"},
+                                                                    {"${RowsCopied}", "RowsCopied"}
+                                                                };
     }
 
     [Serializable]
@@ -190,7 +222,7 @@ namespace SSISBulkExportTask100
                         index++;
                     }
 
-                    _stringBuilder.Append(string.Format(@" ""SET FMTONLY OFF exec {0}.{1} {2}"" queryout ", Database.Trim(), StoredProcedure.Trim(), storedProcParams));
+                    _stringBuilder.Append(string.Format(@" ""exec {0}.{1} {2}"" queryout ", Database.Trim(), StoredProcedure.Trim(), storedProcParams));
                     break;
                 case Keys.TAB_VIEW:
                     _stringBuilder.Append(string.Format(@" ""{0}.{1}"" out ", Database.Trim(), View.Trim()));
@@ -351,6 +383,192 @@ namespace SSISBulkExportTask100
             }
 
             return dbtype;
+        }
+    }
+
+    public class ExportedFileDetails
+    {
+        public double Size { get; set; }
+        public string Path { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public string RowsCopied { get; set; }
+        public double GetExecutionTime
+        {
+            get
+            {
+                return (EndTime - StartTime).TotalMinutes;
+            }
+        }
+    }
+
+    public static class Tools
+    {
+        /// <summary>
+        /// Converts the bytes to megabytes.
+        /// </summary>
+        /// <param name="bytes">The no of bytes.</param>
+        /// <returns></returns>
+        public static double ConvertBytesToMegabytes(long bytes)
+        {
+            return (bytes / 1024f) / 1024f;
+        }
+
+        /// <summary>
+        /// Finds the string in combo box.
+        /// </summary>
+        /// <param name="comboBox">The combo box.</param>
+        /// <param name="searchTextItem">The search text item.</param>
+        /// <param name="startIndex">The start index.</param>
+        /// <returns></returns>
+        public static int FindStringInComboBox(ComboBox comboBox, string searchTextItem, int startIndex)
+        {
+            if (startIndex >= comboBox.Items.Count)
+                return -1;
+
+            int indexPosition = comboBox.FindString(searchTextItem, startIndex);
+
+            if (indexPosition <= startIndex)
+                return -1;
+
+            return comboBox.Items[indexPosition].ToString() == searchTextItem
+                                    ? indexPosition
+                                    : FindStringInComboBox(comboBox, searchTextItem, indexPosition);
+        }
+
+        public static bool SendEmail(ExportedFileDetails exportedFileDetails,
+                                     VariableDispenser variableDispenser,
+                                     Connections connections,
+                                     IDTSComponentEvents componentEvents,
+                                     string filePath,
+                                     string from,
+                                     string to,
+                                     string subject,
+                                     string body,
+                                     string smtp)
+        {
+            bool retVal = false;
+            bool refire = false;
+            try
+            {
+
+                componentEvents.FireInformation(0, "SSISBulkExportTask",
+                                                "Build the e-mail...",
+                                                string.Empty, 0, ref refire);
+
+                using (MailMessage mailMessage = new MailMessage
+                {
+                    From = new MailAddress(EvaluateExpression(from, variableDispenser).ToString()),
+                    Subject = EvaluateExpression(subject, variableDispenser).ToString(),
+                    Body = EvaluateExpression(EvaluateInternalExpression(body, exportedFileDetails), variableDispenser).ToString(),
+                })
+                {
+                    var strTo = EvaluateExpression(to, variableDispenser).ToString().Split(';');
+
+                    foreach (string item in strTo)
+                    {
+                        mailMessage.To.Add(new MailAddress(item));
+                    }
+
+                    try
+                    {
+                        componentEvents.FireInformation(0, "SSISBulkExportTask",
+                                                        string.Format("Send e-mail using {0}", GetConnectionParameter(connections[smtp].ConnectionString, "SmtpServer")),
+                                                        string.Empty, 0, ref refire);
+
+                        SmtpClient smtpClient = new SmtpClient(GetConnectionParameter(connections[smtp].ConnectionString, "SmtpServer"))
+                        {
+                            EnableSsl = Convert.ToBoolean(GetConnectionParameter(connections[smtp].ConnectionString, "EnableSsl")),
+                            UseDefaultCredentials = Convert.ToBoolean(GetConnectionParameter(connections[smtp].ConnectionString, "UseWindowsAuthentication"))
+                        };
+
+                        componentEvents.FireInformation(0, "SSISBulkExportTask", "Send the e-mail", string.Empty, 0, ref refire);
+
+                        smtpClient.Send(mailMessage);
+
+                        componentEvents.FireInformation(0, "SSISBulkExportTask", "E-mail sended successfully", string.Empty, 0, ref refire);
+                    }
+                    catch (Exception exception)
+                    {
+                        componentEvents.FireError(0, "SSISBulkExportTask", string.Format("Problem: {0} {1}", exception.Message, exception.StackTrace), "", 0);
+                        retVal = false;
+                    }
+                }
+
+                retVal = true;
+            }
+            catch (Exception exception)
+            {
+                componentEvents.FireError(0, "SSISBulkExportTask", string.Format("Problem: {0} {1}", exception.Message, exception.StackTrace), "", 0);
+                retVal = false;
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
+        /// Evaluates the internal expression.
+        /// </summary>
+        /// <param name="sourceText">The source text.</param>
+        /// <param name="exportedFileDetails">The exported file details.</param>
+        /// <returns></returns>
+        public static string EvaluateInternalExpression(string sourceText, ExportedFileDetails exportedFileDetails)
+        {
+            PropertyInfo[] propertyInfos = typeof(ExportedFileDetails).GetProperties();
+            return Keys.BodyKeysConcreteValue.Aggregate(sourceText, (current, keyValue) => current.Replace(keyValue.Key, propertyInfos.Where(key => key.Name == keyValue.Value).FirstOrDefault().GetValue(exportedFileDetails, null).ToString()));
+        }
+
+        /// <summary>
+        /// This method evaluate expressions like @([System::TaskName] + [System::TaskID]) or any other operation created using
+        /// ExpressionBuilder
+        /// </summary>
+        /// <param name="mappedParam">The mapped param.</param>
+        /// <param name="variableDispenser">The variable dispenser.</param>
+        /// <returns></returns>
+        public static object EvaluateExpression(string mappedParam, VariableDispenser variableDispenser)
+        {
+            object variableObject;
+
+            var regex = new Regex(Keys.REGEX_EMAIL, RegexOptions.IgnoreCase);
+
+            if (regex.IsMatch(mappedParam))
+                return mappedParam;
+
+            if (mappedParam.Contains("@"))
+            {
+                var expressionEvaluatorClass = new ExpressionEvaluatorClass
+                {
+                    Expression = mappedParam
+                };
+
+                expressionEvaluatorClass.Evaluate(DtsConvert.GetExtendedInterface(variableDispenser),
+                                                  out variableObject,
+                                                  false);
+
+            }
+            else
+            {
+                variableObject = mappedParam;
+            }
+
+            return variableObject;
+        }
+
+        public static string GetConnectionParameter(string connectionString, string parameter)
+        {
+            string result = string.Empty;
+            parameter += "=";
+
+            int startOf = connectionString.IndexOf(parameter);
+
+            if (startOf != -1)
+            {
+                startOf += parameter.Length;
+                int endOf = connectionString.IndexOf(";", startOf);
+                result = connectionString.Substring(startOf, endOf - startOf);
+            }
+
+            return result;
         }
     }
 }

@@ -94,6 +94,8 @@
             this.cmdFileFormatVariable = new System.Windows.Forms.Button();
             this.label12 = new System.Windows.Forms.Label();
             this.cmbFormatFile = new System.Windows.Forms.ComboBox();
+            this.btEmail = new System.Windows.Forms.Button();
+            this.chkEmail = new System.Windows.Forms.CheckBox();
             this.tabControl.SuspendLayout();
             this.tabSQL.SuspendLayout();
             this.tabView.SuspendLayout();
@@ -132,9 +134,9 @@
             // 
             this.cmbSQLServer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbSQLServer.FormattingEnabled = true;
-            this.cmbSQLServer.Location = new System.Drawing.Point(93, 6);
+            this.cmbSQLServer.Location = new System.Drawing.Point(83, 6);
             this.cmbSQLServer.Name = "cmbSQLServer";
-            this.cmbSQLServer.Size = new System.Drawing.Size(419, 21);
+            this.cmbSQLServer.Size = new System.Drawing.Size(429, 21);
             this.cmbSQLServer.TabIndex = 0;
             // 
             // btGO
@@ -155,6 +157,7 @@
             this.label1.Size = new System.Drawing.Size(65, 13);
             this.label1.TabIndex = 2;
             this.label1.Text = "SQL Server:";
+            this.toolTip1.SetToolTip(this.label1, "An ADO.NET Connection");
             // 
             // tabControl
             // 
@@ -342,6 +345,7 @@
             // 
             // btPreview
             // 
+            this.btPreview.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btPreview.Location = new System.Drawing.Point(484, 211);
             this.btPreview.Name = "btPreview";
             this.btPreview.Size = new System.Drawing.Size(75, 23);
@@ -779,12 +783,35 @@
             this.cmbFormatFile.Size = new System.Drawing.Size(152, 21);
             this.cmbFormatFile.TabIndex = 48;
             // 
+            // btEmail
+            // 
+            this.btEmail.Location = new System.Drawing.Point(198, 213);
+            this.btEmail.Name = "btEmail";
+            this.btEmail.Size = new System.Drawing.Size(92, 23);
+            this.btEmail.TabIndex = 58;
+            this.btEmail.Text = "e-mail details";
+            this.btEmail.UseVisualStyleBackColor = true;
+            this.btEmail.Click += new System.EventHandler(this.btEmail_Click);
+            // 
+            // chkEmail
+            // 
+            this.chkEmail.AutoSize = true;
+            this.chkEmail.Location = new System.Drawing.Point(15, 217);
+            this.chkEmail.Name = "chkEmail";
+            this.chkEmail.Size = new System.Drawing.Size(176, 17);
+            this.chkEmail.TabIndex = 57;
+            this.chkEmail.Text = "Send the final stats file by e-mail";
+            this.chkEmail.UseVisualStyleBackColor = true;
+            this.chkEmail.CheckedChanged += new System.EventHandler(this.chkEmail_CheckedChanged);
+            // 
             // frmEditProperties
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(572, 585);
+            this.Controls.Add(this.btEmail);
+            this.Controls.Add(this.chkEmail);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox1);
@@ -891,6 +918,8 @@
         private System.Windows.Forms.CheckBox chkQuotes;
         private System.Windows.Forms.CheckBox chkUnicode;
         private System.Windows.Forms.CheckBox chkChDataType;
+        private System.Windows.Forms.Button btEmail;
+        private System.Windows.Forms.CheckBox chkEmail;
 
     }
 }

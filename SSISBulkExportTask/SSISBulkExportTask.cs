@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Xml;
 using Microsoft.SqlServer.Dts.Runtime;
@@ -19,7 +20,7 @@ namespace SSISBulkExportTask100.SSIS
         DisplayName = "Bulk Export Task",
         UITypeName = "SSISBulkExportTask100.SSISBulkExportTaskUIInterface" +
         ",SSISBulkExportTask100," +
-        "Version=1.3.0.10," +
+        "Version=1.3.0.28," +
         "Culture=Neutral," +
         "PublicKeyToken=7660ecf4382af446",
         IconResource = "SSISBulkExportTask100.DownloadIcon.ico",
@@ -92,6 +93,18 @@ namespace SSISBulkExportTask100.SSIS
         public string UseCharacterDataType { get; set; }
         [Category("Component specific"), Description("Specifies the maximum number of syntax errors that can occur before the bcp operation is canceled. A syntax error implies a data conversion error to the target data type. The max_errors total excludes any errors that can be detected only at the server, such as constraint violations.\nA row that cannot be copied by the bcp utility is ignored and is counted as one error. If this option is not included, the default is 10.")]
         public string MaxErrors { get; set; }
+        [Category("Component specific"), Description("SendFileByEmail")]
+        public string SendFileByEmail { get; set; }
+        [Category("Component specific"), Description("SmtpServer")]
+        public string SmtpServer { get; set; }
+        [Category("Component specific"), Description("SmtpRecipients")]
+        public string SmtpRecipients { get; set; }
+        [Category("Component specific"), Description("From")]
+        public string SmtpFrom { get; set; }
+        [Category("Component specific"), Description("EmailSubject")]
+        public string EmailSubject { get; set; }
+        [Category("Component specific"), Description("EmailBody")]
+        public string EmailBody { get; set; }
         #endregion
 
         #region Private Properties
@@ -136,6 +149,12 @@ namespace SSISBulkExportTask100.SSIS
                 isBaseValid = false;
             }
 
+            if (SendFileByEmail == Keys.TRUE && (string.IsNullOrEmpty(SmtpFrom) || string.IsNullOrEmpty(SmtpRecipients)))
+            {
+                componentEvents.FireError(0, "SSISReportGeneratorTask", "Please specify the minimal elements to send the email: the Sender and the Recipient(s) addresses.", "", 0);
+                isBaseValid = false;
+            }
+
             return isBaseValid ? DTSExecResult.Success : DTSExecResult.Failure;
         }
 
@@ -162,6 +181,10 @@ namespace SSISBulkExportTask100.SSIS
                                             string.Empty,
                                             0,
                                             ref refire);
+            ExportedFileDetails exportedFileDetails = new ExportedFileDetails
+                                                          {
+                                                              StartTime = DateTime.Now
+                                                          };
 
             GetNeededVariables(variableDispenser, componentEvents);
 
@@ -235,6 +258,8 @@ namespace SSISBulkExportTask100.SSIS
 
                 List<string> result = ExecuteReader(commandBulkExport, variableDispenser, connections, 0);
 
+
+
                 componentEvents.FireInformation(0,
                                "SSISBulkExportTask",
                                "Execution response:",
@@ -242,14 +267,19 @@ namespace SSISBulkExportTask100.SSIS
                                0,
                                ref refire);
 
+                bool error = false;
+
                 foreach (var item in result)
                 {
                     if (item.Trim().StartsWith("Error"))
+                    {
                         componentEvents.FireError(0,
-                                         "SSISBulkExportTask",
-                                         item.Trim(),
-                                         string.Empty,
-                                         0);
+                                                  "SSISBulkExportTask",
+                                                  item.Trim(),
+                                                  string.Empty,
+                                                  0);
+                        error = true;
+                    }
                     else
                         componentEvents.FireInformation(0,
                                    "SSISBulkExportTask",
@@ -259,12 +289,54 @@ namespace SSISBulkExportTask100.SSIS
                                    ref refire);
                 }
 
-                componentEvents.FireInformation(0,
-                                               "SSISBulkExportTask",
-                                               "The Bulk export has been succesfully done!",
-                                               string.Empty,
-                                               0,
-                                               ref refire);
+                if (error)
+                    componentEvents.FireError(0,
+                                          "SSISBulkExportTask",
+                                          "Bulk Export Error! Please watch the log",
+                                          string.Empty,
+                                          0);
+                else
+                {
+                    componentEvents.FireInformation(0,
+                                                    "SSISBulkExportTask",
+                                                    "The Bulk export has been succesfully done!",
+                                                    string.Empty,
+                                                    0,
+                                                    ref refire);
+
+                    if (SendFileByEmail == Keys.TRUE)
+                    {
+                        componentEvents.FireInformation(0, "SSISReportGeneratorTask",
+                                                        string.Format("Prepare to send the file by email from {0} to {1}",
+                                                                      Tools.EvaluateExpression(SmtpFrom, variableDispenser),
+                                                                      Tools.EvaluateExpression(SmtpRecipients, variableDispenser)),
+                                                        string.Empty, 0, ref refire);
+
+                        string targetFile = DestinationByFileConnection.Trim() == Keys.TRUE
+                                                ? connections[DestinationPath].ConnectionString
+                                                : EvaluateExpression(DestinationPath, variableDispenser).ToString();
+
+                        var fileInfo = new FileInfo(targetFile);
+
+                        exportedFileDetails.Path = targetFile;
+                        exportedFileDetails.Size = Tools.ConvertBytesToMegabytes(fileInfo.Length);
+                        exportedFileDetails.EndTime = DateTime.Now;
+                        exportedFileDetails.RowsCopied = (from res in result
+                                                          where res.ToLower().Contains("rows copied")
+                                                          select res.Replace("rows copied", string.Empty)).FirstOrDefault();
+
+                        Tools.SendEmail(exportedFileDetails,
+                                        variableDispenser,
+                                        connections,
+                                        componentEvents,
+                                        targetFile,
+                                        SmtpFrom,
+                                        SmtpRecipients,
+                                        EmailSubject,
+                                        EmailBody,
+                                        SmtpServer);
+                    }
+                }
 
             }
             catch (Exception ex)
@@ -709,6 +781,24 @@ namespace SSISBulkExportTask100.SSIS
             XmlAttribute maxErrors = doc.CreateAttribute(string.Empty, Keys.MAX_ERRORS, string.Empty);
             maxErrors.Value = MaxErrors;
 
+            XmlAttribute sendFileByEmail = doc.CreateAttribute(string.Empty, Keys.SEND_FILE_BY_EMAIL, string.Empty);
+            sendFileByEmail.Value = SendFileByEmail;
+
+            XmlAttribute serverSMTP = doc.CreateAttribute(string.Empty, Keys.SMTP_SERVER, string.Empty);
+            serverSMTP.Value = SmtpServer;
+
+            XmlAttribute recipients = doc.CreateAttribute(string.Empty, Keys.RECIPIENTS, string.Empty);
+            recipients.Value = SmtpRecipients;
+
+            XmlAttribute smtpFrom = doc.CreateAttribute(string.Empty, Keys.FROM, string.Empty);
+            smtpFrom.Value = SmtpFrom;
+
+            XmlAttribute emailSubject = doc.CreateAttribute(string.Empty, Keys.EMAIL_SUBJECT, string.Empty);
+            emailSubject.Value = EmailSubject;
+
+            XmlAttribute emailBody = doc.CreateAttribute(string.Empty, Keys.EMAIL_BODY, string.Empty);
+            emailBody.Value = EmailBody;
+
             taskElement.Attributes.Append(sqlServer);
             taskElement.Attributes.Append(dataSource);
             taskElement.Attributes.Append(dataBase);
@@ -737,6 +827,13 @@ namespace SSISBulkExportTask100.SSIS
             taskElement.Attributes.Append(useUnicodeChr);
             taskElement.Attributes.Append(characterDataType);
             taskElement.Attributes.Append(maxErrors);
+
+            taskElement.Attributes.Append(sendFileByEmail);
+            taskElement.Attributes.Append(serverSMTP);
+            taskElement.Attributes.Append(recipients);
+            taskElement.Attributes.Append(smtpFrom);
+            taskElement.Attributes.Append(emailSubject);
+            taskElement.Attributes.Append(emailBody);
 
             doc.AppendChild(taskElement);
         }
@@ -783,6 +880,14 @@ namespace SSISBulkExportTask100.SSIS
                 UseCharacterDataType = node.Attributes.GetNamedItem(Keys.CHARACTER_DATA_TYPE).Value;
                 UseUnicodeCharacters = node.Attributes.GetNamedItem(Keys.UNICODE_CHR).Value;
                 SET_QUOTED_IDENTIFIERS_ON = node.Attributes.GetNamedItem(Keys.SET_QUOTED_IDENTIFIERS_ON).Value;
+
+                SendFileByEmail = node.Attributes.GetNamedItem(Keys.SEND_FILE_BY_EMAIL).Value;
+                SmtpServer = node.Attributes.GetNamedItem(Keys.SMTP_SERVER).Value;
+                SmtpRecipients = node.Attributes.GetNamedItem(Keys.RECIPIENTS).Value;
+
+                SmtpFrom = node.Attributes.GetNamedItem(Keys.FROM).Value;
+                EmailSubject = node.Attributes.GetNamedItem(Keys.EMAIL_SUBJECT).Value;
+                EmailBody = node.Attributes.GetNamedItem(Keys.EMAIL_BODY).Value;
             }
             catch
             {

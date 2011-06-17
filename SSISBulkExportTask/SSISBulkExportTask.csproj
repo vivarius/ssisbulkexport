@@ -66,13 +66,19 @@
     <Compile Include="frmEditProperties.Designer.cs">
       <DependentUpon>frmEditProperties.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmEmail.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmEmail.Designer.cs">
+      <DependentUpon>frmEmail.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmPreview.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmPreview.Designer.cs">
       <DependentUpon>frmPreview.cs</DependentUpon>
     </Compile>
-    <Compile Include="Keys.cs" />
+    <Compile Include="Goodies.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="SSISBulkExportTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -81,6 +87,9 @@
   <ItemGroup>
     <EmbeddedResource Include="frmEditProperties.resx">
       <DependentUpon>frmEditProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmEmail.resx">
+      <DependentUpon>frmEmail.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmPreview.resx">
       <DependentUpon>frmPreview.cs</DependentUpon>

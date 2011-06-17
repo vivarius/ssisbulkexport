@@ -235,6 +235,16 @@ namespace SSISBulkExportTask100
                 if (_taskHost.Properties[Keys.DATA_SOURCE].GetValue(_taskHost) != null)
                     tabControl.SelectedTab = tabControl.TabPages.Cast<TabPage>().Where(tab => tab.Text == _taskHost.Properties[Keys.DATA_SOURCE].GetValue(_taskHost).ToString()).FirstOrDefault();
 
+                if (_taskHost.Properties[Keys.SEND_FILE_BY_EMAIL].GetValue(_taskHost) != null)
+                {
+                    chkEmail.Checked = _taskHost.Properties[Keys.SEND_FILE_BY_EMAIL].GetValue(_taskHost).ToString() == Keys.TRUE;
+                    EnableSmtp(chkEmail.Checked);
+                }
+                else
+                {
+                    EnableSmtp(false);
+                }
+
                 optFileVariable.CheckedChanged += (optFileVariable_CheckedChanged_1);
                 optFileVariable.Click += (optFileVariable_Click);
                 optFileConnection.CheckedChanged += (optFileConnection_CheckedChanged_1);
@@ -416,7 +426,6 @@ namespace SSISBulkExportTask100
                                             var spItem = sqlDataReaderTables.GetString(0).Split('.');
                                             LoadStoredProcedureParameters(spItem[0].Replace("[", string.Empty).Replace("]", string.Empty), spItem[1].Replace("[", string.Empty).Replace("]", string.Empty));
                                         }
-
                                     }
                                 }
                         }
@@ -426,6 +435,11 @@ namespace SSISBulkExportTask100
             }
 
             Cursor = Cursors.Arrow;
+        }
+
+        private void EnableSmtp(bool enable)
+        {
+            btEmail.Enabled = enable;
         }
 
         private void LoadStoredProcedureParameters(string schema, string storedProcedureName)
@@ -579,6 +593,10 @@ namespace SSISBulkExportTask100
 
             _taskHost.Properties[Keys.SQL_STORED_PROCEDURE_PARAMS].SetValue(_taskHost, mappingParams);
 
+            _taskHost.Properties[Keys.SEND_FILE_BY_EMAIL].SetValue(_taskHost, chkEmail.Checked
+                                                                                    ? Keys.TRUE
+                                                                                    : Keys.FALSE);
+
             string val = (from db in _connections[cmbSQLServer.Text].ConnectionString.Split(';')
                           where db.Contains("Initial Catalog")
                           select db).FirstOrDefault();
@@ -618,7 +636,10 @@ namespace SSISBulkExportTask100
 
         private void btGO_Click(object sender, EventArgs e)
         {
-            LoadDataBaseObjects();
+            if (cmbSQLServer.Text != string.Empty)
+                LoadDataBaseObjects();
+            else
+                MessageBox.Show("Please (configure and) choose a valid ADO.NET Connection");
         }
 
         private void chkTrustedConnection_Click(object sender, EventArgs e)
@@ -742,11 +763,10 @@ namespace SSISBulkExportTask100
         {
             var stringBuilder = new StringBuilder();
 
-            string val = (_connections[cmbSQLServer.Text].ConnectionString.Split(';')
-                        .Where(delegate(string db)
-                                {
-                                    return db.Contains("Initial Catalog");
-                                })).FirstOrDefault().Split('=')[1];
+            string val = (_connections[cmbSQLServer.Text].ConnectionString.Split(';').Where(delegate(string db)
+                                                        {
+                                                            return db.Contains("Initial Catalog");
+                                                        })).FirstOrDefault().Split('=')[1];
 
             switch (tabControl.SelectedTab.Text)
             {
@@ -824,8 +844,21 @@ namespace SSISBulkExportTask100
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.Cancel;
+            DialogResult = DialogResult.OK;
             Close();
+        }
+
+        private void btEmail_Click(object sender, EventArgs e)
+        {
+            using (frmEmail frmEmail = new frmEmail(_taskHost, _connections))
+            {
+                frmEmail.ShowDialog();
+            }
+        }
+
+        private void chkEmail_CheckedChanged(object sender, EventArgs e)
+        {
+            btEmail.Enabled = chkEmail.Checked;
         }
     }
 }
