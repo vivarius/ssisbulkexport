@@ -99,9 +99,9 @@
     <None Include="SSISBulkExportTask100.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DownloadIcon.ico">
+    <EmbeddedResource Include="DownloadIcon.ico">
       <CustomToolNamespace>SSISBulkExportTask100</CustomToolNamespace>
-    </Content>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
